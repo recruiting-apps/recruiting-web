@@ -11,6 +11,7 @@ import RoleRequired from '@/shared/ui/components/layout/RoleRequired'
 import ErrorPage from '@/shared/ui/pages/ErrorPage'
 import HomePage from '@/shared/ui/pages/HomePage'
 import NotFoundPage from '@/shared/ui/pages/NotFoundPage'
+import EditProfileView from '@/users/ui/pages/EditProfileView'
 import ProfileView from '@/users/ui/pages/ProfileView'
 import { type RouteObject, createBrowserRouter, Navigate } from 'react-router-dom'
 
@@ -25,7 +26,16 @@ const AUTH_REQUIRED_ROUTES: RouteObject[] = [
   },
   {
     path: '/profile',
-    element: <ProfileView />
+    children: [
+      {
+        path: '',
+        element: <ProfileView />
+      },
+      {
+        path: 'edit/:id',
+        element: <EditProfileView />
+      }
+    ]
   },
   {
     path: '/offers',

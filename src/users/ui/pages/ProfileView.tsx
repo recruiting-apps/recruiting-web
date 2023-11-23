@@ -6,12 +6,20 @@ import Divider from '@/shared/ui/components/utils/Divider'
 import Button from '@/shared/ui/components/form/Button'
 import { useBooleanState } from '@/shared/hooks/useBooleanState'
 import UploadCvFileModal from '../components/UploadCvFileModal'
+import { useNavigate } from 'react-router-dom'
 
 const ProfileView: React.FC = () => {
   const { user: currentUser } = useAuth()
 
+  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [showUploadCV, toggleShowUploadCV] = useBooleanState()
+
+  const [imageError, setImageError] = useState(false)
+
+  const handleImageError = () => {
+    setImageError(true)
+  }
 
   useEffect(() => {
     if (!currentUser) return
@@ -21,7 +29,6 @@ const ProfileView: React.FC = () => {
     void new UsersService()
       .findById(id)
       .then((response) => {
-        console.log(response)
         setUser(response)
       })
   }, [])
@@ -29,6 +36,7 @@ const ProfileView: React.FC = () => {
   const handleDownloadCV = () => {
     if (!user) return
     const url = user?.cvPath
+    console.log(url)
 
     const downloadAnchorNode = document.createElement('a')
     downloadAnchorNode.setAttribute('href', url)
@@ -37,17 +45,38 @@ const ProfileView: React.FC = () => {
     downloadAnchorNode.click()
   }
 
+  const handleEdit = () => {
+    navigate(`/profile/edit/${user?.id ?? ''}`)
+  }
+
   return (
-    <div className='max-h-screen'>
-      <h1 className='text-3xl font-semibold uppercase'>Profile</h1>
+    <div className='max-h-screen mb-5'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-3xl font-semibold uppercase'>Profile</h1>
+        <Button color={'primary'} onClick={handleEdit}>Edit profile</Button>
+      </div>
       <Divider className='mt-2' />
 
       <div className='grid grid-cols-[1fr_3fr] gap-3'>
         <section className='shadow-card py-5 px-4 rounded-md'>
           <div className='w-[250px] h-[250px] mx-auto'>
-            <img
-              className='w-full h-full object-cover rounded-full'
-              src={user?.profileImagePath} alt={`Image profile ${user?.fullName}`} />
+
+            {imageError
+              ? (
+                <img
+                  className='w-full h-full object-cover rounded-full'
+                  src="profile.jpg"
+                  alt="Default Image"
+                />
+                )
+              : (
+                <img
+                  className='w-full h-full object-cover rounded-full'
+                  src={user?.profileImagePath} alt={`Image profile ${user?.fullName}`}
+                  onError={handleImageError}
+                />
+                )}
+
           </div>
 
           <Divider className='mt-2 mb-2'></Divider>
@@ -102,7 +131,7 @@ const ProfileView: React.FC = () => {
         </main>
       </div>
 
-      { user && <UploadCvFileModal user={user} isOpen={showUploadCV} onClose={toggleShowUploadCV}/>}
+      {user && <UploadCvFileModal user={user} isOpen={showUploadCV} onClose={toggleShowUploadCV} />}
     </div>
   )
 }

@@ -8,12 +8,15 @@ import moment from 'moment'
 import Button from '@/shared/ui/components/form/Button'
 import { type Application } from '@/offers/models/application.interface'
 import { Status } from '@/offers/models/enums/status.enum'
+import { useLoading } from '@/shared/hooks/useLoading'
 
 const OfferDetailView: React.FC = () => {
   const navigate = useNavigate()
   const params = useParams()
   const [offer, setOffer] = useState<Offer | null>(null)
   const [betterApplicant, setBetterApplicant] = useState<Application | null>(null)
+
+  const { loading, startLoading, stopLoading } = useLoading({})
 
   useEffect(() => {
     const id = params.id
@@ -52,6 +55,7 @@ const OfferDetailView: React.FC = () => {
   }
 
   const findBetterApplicant = () => {
+    startLoading()
     void new OffersService()
       .findBetterApplicant(offer?.id ?? '')
       .then((offer) => {
@@ -62,6 +66,9 @@ const OfferDetailView: React.FC = () => {
       .catch((error) => {
         const { message } = error.data
         useToast({ message, type: 'error' })
+      })
+      .finally(() => {
+        stopLoading()
       })
   }
 
@@ -131,7 +138,7 @@ const OfferDetailView: React.FC = () => {
         <div className='shadow-card-bold rounded-md p-4'>
           <div className='flex justify-between items-center'>
             <h3 className='text-xl font-semibold'>Find the best applicant</h3>
-            { betterApplicant && <Button color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
+            { betterApplicant === null && <Button isLoading={loading} color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
           </div>
           <Divider className='my-2' />
           <p className=''>We will find the best applicant for you</p>

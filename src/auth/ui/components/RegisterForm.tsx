@@ -121,7 +121,7 @@ const RegisterForm: React.FC = () => {
   return (
     <Form
       ref={formRef}
-      className='[&>section>fieldset]:mb-4 [&>section>fieldset]:border-[2px] [&>section>fieldset]:border-gray-200 [&>section>fieldset]:rounded-lg [&>section>fieldset]:p-5  '
+      className='[&>section>fieldset]:mb-4 [&>section>fieldset]:border-[2px] [&>section>fieldset]:border-gray-200 [&>section>fieldset]:rounded-lg [&>section>fieldset]:p-5'
       onSubmit={(event) => { void onSubmit(event) }}
       hasCancelButton={false}
       showButtons={false}

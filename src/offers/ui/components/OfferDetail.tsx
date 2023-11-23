@@ -31,6 +31,10 @@ const OfferDetail: React.FC = () => {
         updateOffer(response)
         useToast({ message: 'Applied successfully', type: 'success' })
       })
+      .catch((error) => {
+        const { message } = error.data
+        useToast({ message, type: 'error' })
+      })
   }
 
   return (
