@@ -67,9 +67,9 @@ const MyApplicationsView: React.FC = () => {
                 <footer className='[&>p]:text-sm'>
                   <p>Application date: {moment(application?.applicationDate).format('DD/MM/YYYY hh:mm A')}</p>
 
-                  <div className="flex justify-end">
+                  {application?.status === Status.PENDING && <div className="flex justify-end">
                     <Button color='primary' className='mt-2' onClick={handleCancelApplication(offer)}>Cancel Application</Button>
-                  </div>
+                  </div>}
                 </footer>
               </div>
             )
