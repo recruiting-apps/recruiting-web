@@ -15,7 +15,7 @@ const MyOffersView: React.FC = () => {
     <OffersProvider owner>
       <div className='flex justify-between items-center'>
         <h1 className='uppercase text-3xl font-semibold'>My offers</h1>
-        <Button color='primary' onClick={handleClickCreateOffer}>Crear nueva Solicitud</Button>
+        <Button color='primary' onClick={handleClickCreateOffer}>Create new offer</Button>
       </div>
 
       <Divider className='my-2'></Divider>
