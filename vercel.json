@@ -1,5 +1,12 @@
 {
   "rewrites":  [
     {"source": "/(.*)", "destination": "/"}
+  ],
+  "redirects": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "http://recruiting-app-api-env.eba-rziviyii.us-east-2.elasticbeanstalk.com/api/v1/:path*",
+      "permanent": true
+    }
   ]
 }
