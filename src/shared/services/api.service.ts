@@ -1,6 +1,7 @@
-import { AuthStore } from '@/auth/services/auth.store'
 import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { StatusCodes } from 'http-status-codes'
+import appStorage from '../config/storage'
+import { AUTH_STORAGE_KEY } from '@/auth/store/auth.store'
 
 const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 
@@ -8,7 +9,6 @@ export abstract class AppServices {
   protected _baseUrl: string
   protected _fullBaseApiURL: string
   protected _contentType: string
-  private readonly _authStore: AuthStore = new AuthStore()
 
   constructor (config: { baseUrl: string, contentType: string }) {
     this._baseUrl = config.baseUrl
@@ -19,7 +19,11 @@ export abstract class AppServices {
   }
 
   private setHeader (): void {
-    const token = this._authStore.getToken()
+    const auth = appStorage.getItem(AUTH_STORAGE_KEY)
+
+    const { state } = JSON.parse(String(auth) ?? '{state:{ token: null }}')
+    const { token } = state
+
     if (token !== null) { axios.defaults.headers.common.Authorization = `Bearer ${token}` }
 
     axios.defaults.headers.common['Content-Type'] = this._contentType
@@ -89,35 +93,6 @@ export abstract class AppServices {
       .catch(async (error: AxiosError) => {
         if (error.response?.status === StatusCodes.UNAUTHORIZED) {
           this.handleNotAuthorized()
-        }
-        return await Promise.reject(error.response)
-      })
-  }
-
-  protected async externalPost<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    axios.defaults.headers.common['Content-Type'] = 'application/json'
-    axios.defaults.headers.common.Authorization = undefined
-
-    return await axios.post(url, data, config)
-      .then((response: AxiosResponse) => {
-        return response
-      })
-      .catch(async (error: AxiosError) => {
-        if (error.response?.status === StatusCodes.UNAUTHORIZED) {
-          console.log(error)
-        }
-        return await Promise.reject(error.response)
-      })
-  }
-
-  protected async externalGet<T>(url: string): Promise<AxiosResponse<T>> {
-    return await axios.get(url, {})
-      .then((response: AxiosResponse) => {
-        return response
-      })
-      .catch(async (error: AxiosError) => {
-        if (error.response?.status === StatusCodes.UNAUTHORIZED) {
-          console.log(error)
         }
         return await Promise.reject(error.response)
       })

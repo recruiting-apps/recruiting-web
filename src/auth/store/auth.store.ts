@@ -1,23 +1,28 @@
 import { type UserLogin, type UserToStorage } from '@/users/models/user.interface'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { AuthServices } from '../services/auth.service'
+import appStorage from '@/shared/config/storage'
+
+export const AUTH_STORAGE_KEY = 'userInfo'
 
 interface AuthState {
   isAuthenticated: boolean
   user: UserToStorage | null
+  token: string | null
 
   login: (credentials: UserLogin) => Promise<UserToStorage | null>
   logout: () => void
 }
 
-type DefaultAuthState = Pick<AuthState, 'isAuthenticated' | 'user'>
+type DefaultAuthState = Pick<AuthState, 'isAuthenticated' | 'user' | 'token'>
 
 export const useAuthStore = create(
   persist<AuthState>((set, _) => {
     const DEFAULT_STATE: DefaultAuthState = {
       isAuthenticated: false,
-      user: null
+      user: null,
+      token: null
     }
 
     return {
@@ -27,10 +32,13 @@ export const useAuthStore = create(
         const authService = new AuthServices()
 
         return await authService.login(credentials)
-          .then(user => {
+          .then(response => {
+            const { user, token } = response
+
             set({
               isAuthenticated: user !== null,
-              user
+              user,
+              token
             })
 
             return user
@@ -42,7 +50,8 @@ export const useAuthStore = create(
     }
   },
   {
-    name: 'auth-storage'
+    name: AUTH_STORAGE_KEY,
+    storage: createJSONStorage(() => appStorage)
   }
   )
 )

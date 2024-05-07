@@ -1,13 +1,18 @@
 import { useAuth } from '@/auth/hooks/useAuth'
 import Button from '@/shared/ui/components/form/Button'
 import Divider from '@/shared/ui/components/utils/Divider'
-import { useOffers } from '../hooks/useOffers'
 import { OffersService } from '@/offers/services/offers.service'
 import { useToast } from '@/shared/hooks/useToast'
 import { useEffect, useState } from 'react'
+import { type Offer } from '@/offers/models/offer.interface'
+import { useOffersQuery } from '../hooks/useOffersQuery'
 
-const OfferDetail: React.FC = () => {
-  const { selectedOffer: offer, setSelectedOffer, updateOffer } = useOffers()
+interface OfferDetailProps {
+  offer: Offer | null
+}
+
+const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
+  const { handleUpdateOffer } = useOffersQuery()
   const { user } = useAuth()
 
   const [canApply, setCanApply] = useState(false)
@@ -26,9 +31,8 @@ const OfferDetail: React.FC = () => {
 
     void new OffersService()
       .apply(offer.id)
-      .then((response) => {
-        setSelectedOffer(response)
-        updateOffer(response)
+      .then(async (response) => {
+        await handleUpdateOffer(response)
         useToast({ message: 'Applied successfully', type: 'success' })
       })
       .catch((error) => {

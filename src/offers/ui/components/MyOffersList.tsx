@@ -1,10 +1,10 @@
 import Button from '@/shared/ui/components/form/Button'
-import { useOffers } from '../hooks/useOffers'
 import { useNavigate } from 'react-router-dom'
 import { type Offer } from '@/offers/models/offer.interface'
+import { useOffersQuery } from '../hooks/useOffersQuery'
 
 const MyOffersList: React.FC = () => {
-  const { offers } = useOffers()
+  const { offers } = useOffersQuery()
   const navigate = useNavigate()
 
   const handleClickDetailOffer = (offer: Offer) => () => {

@@ -1,41 +1,15 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { type Offer } from '@/offers/models/offer.interface'
+import { useNavigate } from 'react-router-dom'
 import Divider from '@/shared/ui/components/utils/Divider'
 import { OffersService } from '@/offers/services/offers.service'
 import { useToast } from '@/shared/hooks/useToast'
 import moment from 'moment'
 import Button from '@/shared/ui/components/form/Button'
-import { type Application } from '@/offers/models/application.interface'
 import { Status } from '@/offers/models/enums/status.enum'
-import { useLoading } from '@/shared/hooks/useLoading'
+import { useOfferDetailQuery } from '../hooks/useOfferDetailQuery'
 
 const OfferDetailView: React.FC = () => {
   const navigate = useNavigate()
-  const params = useParams()
-  const [offer, setOffer] = useState<Offer | null>(null)
-  const [betterApplicant, setBetterApplicant] = useState<Application | null>(null)
-
-  const { loading, startLoading, stopLoading } = useLoading({})
-
-  useEffect(() => {
-    const id = params.id
-
-    if (!id) return
-
-    void new OffersService()
-      .findById(id)
-      .then((offer) => {
-        setOffer(offer)
-
-        const application = offer.applications.find(application => application.status === Status.ACCEPTED)
-        setBetterApplicant(application ?? null)
-      })
-      .catch((error) => {
-        const { message } = error.data
-        useToast({ message, type: 'error' })
-      })
-  }, [])
+  const { offer, betterApplicant, isFetching, refetch } = useOfferDetailQuery()
 
   const handleEditOffer = () => {
     navigate(`/my-offers/offer-form-edit/${offer?.id ?? ''}`)
@@ -44,8 +18,8 @@ const OfferDetailView: React.FC = () => {
   const onCloseOffer = () => {
     void new OffersService()
       .close(offer?.id ?? '')
-      .then((offer) => {
-        setOffer(offer)
+      .then(async () => {
+        await refetch()
         useToast({ message: 'Offer closed successfully', type: 'success' })
       })
       .catch((error) => {
@@ -55,20 +29,15 @@ const OfferDetailView: React.FC = () => {
   }
 
   const findBetterApplicant = () => {
-    startLoading()
     void new OffersService()
       .findBetterApplicant(offer?.id ?? '')
-      .then((offer) => {
-        const application = offer.applications.find(application => application.status === Status.ACCEPTED)
-        setBetterApplicant(application ?? null)
+      .then(async () => {
+        await refetch()
         useToast({ message: 'Better applicant found', type: 'success' })
       })
       .catch((error) => {
         const { message } = error.data
         useToast({ message, type: 'error' })
-      })
-      .finally(() => {
-        stopLoading()
       })
   }
 
@@ -138,7 +107,7 @@ const OfferDetailView: React.FC = () => {
         <div className='shadow-card-bold rounded-md p-4'>
           <div className='flex justify-between items-center'>
             <h3 className='text-xl font-semibold'>Find the best applicant</h3>
-            { betterApplicant === null && <Button isLoading={loading} color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
+            { betterApplicant === null && <Button isLoading={isFetching} color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
           </div>
           <Divider className='my-2' />
           <p className=''>We will find the best applicant for you</p>

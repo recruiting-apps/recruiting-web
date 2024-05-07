@@ -3,17 +3,16 @@ import { StatusCodes } from 'http-status-codes'
 
 import { type User, type UserLogin, type UserToStorage } from '@/users/models/user.interface'
 import { type LoginResponse } from '../response/login.response'
-import { AuthStore } from './auth.store'
+import appStorage from '@/shared/config/storage'
+import cookiesStorage from '@/shared/config/storage/cookies'
+import { AUTH_STORAGE_KEY } from '../store/auth.store'
 
 export class AuthServices extends AppServices {
-  storeService: AuthStore
-
   constructor () {
     super({ baseUrl: 'auth', contentType: 'application/json' })
-    this.storeService = new AuthStore()
   }
 
-  login = async (userLogin: UserLogin): Promise<UserToStorage | null> => {
+  login = async (userLogin: UserLogin): Promise<{ user: UserToStorage | null, token: string | null }> => {
     return await this.post<LoginResponse>('/login', userLogin)
       .then(response => {
         if (response.status === StatusCodes.CREATED) {
@@ -26,22 +25,38 @@ export class AuthServices extends AppServices {
             role
           }
 
-          this.storeService.saveToken(tokens.accessToken)
+          cookiesStorage.setSessionExpiration()
 
-          return userStorage
+          return {
+            user: userStorage,
+            token: tokens.accessToken
+          }
         }
 
-        return null
+        return {
+          user: null,
+          token: null
+        }
       })
   }
 
   logout = (): void => {
-    localStorage.removeItem('auth-storage')
-    this.storeService.removeToken()
+    appStorage.removeItem(AUTH_STORAGE_KEY)
+    cookiesStorage.clearSessionExpiration()
   }
 
   changePassword = async (id: string, dto: { password: string }): Promise<User> => {
     return await this.patch<User>(`/${id}/change-password`, dto)
+      .then(response => response.data)
+  }
+
+  resetPassword = async (payload: { token: string, password: string }): Promise<void> => {
+    await this.post('/reset-password', payload)
+      .then(response => response.data)
+  }
+
+  forgotPassword = async (email: string): Promise<void> => {
+    await this.post('/forgot-password', { email })
       .then(response => response.data)
   }
 }

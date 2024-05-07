@@ -130,7 +130,7 @@ const LoginForm: React.FC = () => {
 
       <Divider className='my-1'></Divider>
 
-      <Button color='primary' type='submit'>Login</Button>
+      <Button color='primary' type='submit' isLoading={loading}>Login</Button>
       <Button color='secondary' onClick={handleRegister}>Register</Button>
 
       <Button color='danger' onClick={() => { void handleLoginWithGoogle() }}>Login with Google</Button>

@@ -23,7 +23,9 @@ export class OffersService extends AppServices {
       .then(response => response.data)
   }
 
-  findById = async (id: string): Promise<Offer> => {
+  findById = async (id: string | undefined): Promise<Offer | null> => {
+    if (!id) return null
+
     return await this.get<Offer>(`/${id}`)
       .then(response => response.data)
   }
