@@ -28,6 +28,8 @@ const RegisterForm: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [cvFile, setCvFile] = useState<File | null>(null)
 
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     hiddenSections(1)
   }, [formRef])
@@ -65,6 +67,8 @@ const RegisterForm: React.FC = () => {
       handleChangeSection()
       return
     }
+
+    setLoading(true)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -116,6 +120,9 @@ const RegisterForm: React.FC = () => {
           useToast({ message, type: 'error' })
         })
     })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   return (
@@ -285,6 +292,7 @@ const RegisterForm: React.FC = () => {
           color='primary'
           type='submit'
           className='w-[150px]'
+          isLoading={loading && currentSection === 3}
         >{ currentSection !== 3 ? 'Next' : 'Submit' }</Button>
       </div>
     </Form>
