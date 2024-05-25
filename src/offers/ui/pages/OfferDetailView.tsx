@@ -6,10 +6,15 @@ import moment from 'moment'
 import Button from '@/shared/ui/components/form/Button'
 import { Status } from '@/offers/models/enums/status.enum'
 import { useOfferDetailQuery } from '../hooks/useOfferDetailQuery'
+import { useState } from 'react'
+import Modal from '@/shared/ui/components/utils/Modal'
+import { useBooleanState } from '@/shared/hooks/useBooleanState'
 
 const OfferDetailView: React.FC = () => {
   const navigate = useNavigate()
-  const { offer, betterApplicant, isFetching, refetch } = useOfferDetailQuery()
+  const { offer, betterApplicant, refetch } = useOfferDetailQuery()
+
+  const [isFinding, setIsFinding] = useState(false)
 
   const handleEditOffer = () => {
     navigate(`/my-offers/offer-form-edit/${offer?.id ?? ''}`)
@@ -29,6 +34,7 @@ const OfferDetailView: React.FC = () => {
   }
 
   const findBetterApplicant = () => {
+    setIsFinding(true)
     void new OffersService()
       .findBetterApplicant(offer?.id ?? '')
       .then(async () => {
@@ -39,6 +45,7 @@ const OfferDetailView: React.FC = () => {
         const { message } = error.data
         useToast({ message, type: 'error' })
       })
+      .finally(() => { setIsFinding(false) })
   }
 
   return (
@@ -88,17 +95,33 @@ const OfferDetailView: React.FC = () => {
             )
           }
           {
-            offer?.applications.map(application => (
-              <div key={application.id} className={`${application.status === Status.REJECTED ? 'bg-red-800' : 'bg-gray-100'} border p-3 rounded-md hover:border-blue-era transition-all duration-100 mb-2`}>
-                <header>
-                  <h4 className='font-bold'>{application.user.fullName}</h4>
-                </header>
-                <p>{application.user.email}</p>
-                <footer>
-                  <p className='text-sm font-semibold'>{moment(application.applicationDate).fromNow()}</p>
-                </footer>
-              </div>
-            ))
+            offer?.applications.map(application => {
+              const [showLetter, toggleShowLetter] = useBooleanState()
+
+              return (
+                <div key={application.id} className={`${application.status === Status.REJECTED ? 'bg-red-800' : 'bg-gray-100'} border p-3 rounded-md hover:border-blue-era transition-all duration-100 mb-2`}>
+                  <header className='flex justify-between items-center'>
+                    <h4 className='font-bold'>{application.user.fullName}</h4>
+                    {
+                      application.letter !== null && (
+                        <Button color='primary' onClick={toggleShowLetter}>Show Presentation Letter</Button>
+                      )
+                    }
+                  </header>
+                  <p>{application.user.email}</p>
+
+                  <footer>
+                    <p className='text-sm font-semibold'>{moment(application.applicationDate).fromNow()}</p>
+                  </footer>
+
+                  <Modal isOpen={showLetter} onClose={toggleShowLetter}>
+                    <h3 className='text-xl font-semibold'>Presentation Letter</h3>
+                    <Divider className='my-2' />
+                    <p>{application.letter}</p>
+                  </Modal>
+                </div>
+              )
+            })
           }
         </div>
       </div>
@@ -107,7 +130,7 @@ const OfferDetailView: React.FC = () => {
         <div className='shadow-card-bold rounded-md p-4'>
           <div className='flex justify-between items-center'>
             <h3 className='text-xl font-semibold'>Find the best applicant</h3>
-            { betterApplicant === null && <Button isLoading={isFetching} color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
+            {betterApplicant === null && <Button isLoading={isFinding} color='primary' onClick={findBetterApplicant}>Find Now!</Button>}
           </div>
           <Divider className='my-2' />
           <p className=''>We will find the best applicant for you</p>

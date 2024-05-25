@@ -7,14 +7,13 @@ import { useState } from 'react'
 import Button from '@/shared/ui/components/form/Button'
 import Divider from '@/shared/ui/components/utils/Divider'
 import { useNavigate } from 'react-router-dom'
-import { loginWithGoogle } from '@/shared/config/firebase/auth'
+import { handleLoginWithGoogle } from '@/shared/config/firebase/auth'
 import { Role } from '@/users/models/enum/role.enum'
-import { UsersService } from '@/users/services/users.service'
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
 
   const handleLogin = async (user: UserLogin) => {
     await login(user)
@@ -46,17 +45,10 @@ const LoginForm: React.FC = () => {
     navigate('/register')
   }
 
-  const handleLoginWithGoogle = async () => {
-    await loginWithGoogle()
+  const onLoginWithGoogle = async () => {
+    await handleLoginWithGoogle()
       .then(async (user) => {
         const { displayName, email, phoneNumber, photoURL, uid } = user
-
-        const existingUser = await new UsersService().findByEmail(email ?? '')
-
-        if (existingUser) {
-          await handleLogin({ email: existingUser.email, password: uid })
-          return
-        }
 
         const displayNameSplit = displayName?.split(' ') ?? []
 
@@ -79,16 +71,15 @@ const LoginForm: React.FC = () => {
           profession: '',
           role: Role.APPLICANT,
           workExperience: '',
-          googleAccount: true
+          googleAccount: true,
+          emailNotification: true,
+          presentationLetters: []
         }
 
-        await new UsersService()
-          .create(userDto)
-          .then(async () => {
-            await handleLogin({ email: userDto.email, password: userDto.password })
-          })
-          .catch(() => {
-            useToast({ type: 'error', message: 'Hubo un error' })
+        await loginWithGoogle({ email: email ?? '', user: userDto })
+          .catch((error) => {
+            const { message } = error.data
+            useToast({ type: 'error', message })
           })
       })
       .catch((error) => {
@@ -133,7 +124,7 @@ const LoginForm: React.FC = () => {
       <Button color='primary' type='submit' isLoading={loading}>Login</Button>
       <Button color='secondary' onClick={handleRegister}>Register</Button>
 
-      <Button color='danger' onClick={() => { void handleLoginWithGoogle() }}>Login with Google</Button>
+      <Button color='danger' onClick={() => { void onLoginWithGoogle() }}>Login with Google</Button>
 
     </Form>
   )

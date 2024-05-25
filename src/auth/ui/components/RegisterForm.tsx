@@ -12,8 +12,8 @@ import { type UserDto } from '@/users/models/user.interface'
 import { type Role } from '@/users/models/enum/role.enum'
 import { uploadFile } from '@/shared/config/firebase/storage'
 import { useToast } from '@/shared/hooks/useToast'
-import { UsersService } from '@/users/services/users.service'
 import { useNavigate } from 'react-router-dom'
+import { AuthServices } from '@/auth/services/auth.service'
 
 const RegisterForm: React.FC = () => {
   const navigate = useNavigate()
@@ -89,7 +89,9 @@ const RegisterForm: React.FC = () => {
       bornDate: new Date(formData.get('bornDate') as string),
       cvPath: '',
       profileImagePath: '',
-      googleAccount: false
+      googleAccount: false,
+      emailNotification: true,
+      presentationLetters: []
     }
 
     if (!imageFile || !cvFile) {
@@ -106,8 +108,8 @@ const RegisterForm: React.FC = () => {
       userDto.profileImagePath = profileImage.url
       userDto.cvPath = cv.url
 
-      await new UsersService()
-        .create(userDto)
+      await new AuthServices()
+        .register(userDto)
         .then(() => {
           useToast({ message: 'User created successfully' })
           setTimeout(() => {

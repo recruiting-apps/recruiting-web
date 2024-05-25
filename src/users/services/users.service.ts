@@ -28,6 +28,11 @@ export class UsersService extends AppServices {
       .then(response => response.data)
   }
 
+  toggleNotifications = async (id: string, emailNotification: boolean): Promise<User> => {
+    return await this.patch<User>(`/${id}`, { emailNotification: !emailNotification })
+      .then(response => response.data)
+  }
+
   update = async (userDto: UserDto, id: string): Promise<User> => {
     const { password, ...user } = userDto
     return await this.patch<User>(`/${id}`, user)

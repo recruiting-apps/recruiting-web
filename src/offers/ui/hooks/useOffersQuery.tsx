@@ -13,9 +13,11 @@ export const useOffersQuery = () => {
   const { user } = useAuth()
   const [userId, setUserId] = useState<string>('')
 
+  const [searchQuery, setSearchQuery] = useState('')
+
   const { data, refetch, isError, isPending, isFetching, isLoading, error } = useQuery({
-    queryKey: [OFFERS_KEY, userId],
-    queryFn: async () => await new OffersService().findAll(userId),
+    queryKey: [OFFERS_KEY, userId, searchQuery],
+    queryFn: async () => await new OffersService().findAll(userId, searchQuery),
     placeholderData: keepPreviousData,
     retry: 2
   })
@@ -25,7 +27,7 @@ export const useOffersQuery = () => {
   }, [pathname])
 
   const handleUpdateOffer = async (offer: Offer) => {
-    await queryClient.setQueryData([OFFERS_KEY, userId], (oldData: Offer[] | undefined) => {
+    await queryClient.setQueryData([OFFERS_KEY, userId, searchQuery], (oldData: Offer[] | undefined) => {
       if (oldData === undefined) return
 
       let offers = oldData ?? []
@@ -40,9 +42,14 @@ export const useOffersQuery = () => {
     })
   }
 
+  const onSearch = (query: string) => {
+    setSearchQuery(query)
+  }
+
   return {
     offers: data ?? [],
     handleUpdateOffer,
+    onSearch,
     refetch,
     isError,
     isPending,

@@ -1,5 +1,10 @@
 import { type Role } from './enum/role.enum'
 
+export interface PresentationLetter {
+  name: string
+  content: string
+}
+
 export interface User {
   id: string
   role: Role
@@ -23,6 +28,9 @@ export interface User {
   profileImagePath: string
 
   googleAccount: boolean
+  emailNotification: boolean
+
+  presentationLetters: PresentationLetter[]
 }
 
 export interface UserDto extends Omit<User, 'id' | 'fullName'> {
@@ -33,4 +41,25 @@ export interface UserLogin extends Pick<User, 'email'> {
   password: string
 }
 
-export interface UserToStorage extends Pick<User, 'id' | 'fullName' | 'role'> {}
+export interface UserToStorage extends Pick<User, 'id' | 'fullName' | 'role' | 'emailNotification'> {}
+
+export const userToDto = (user: User): UserDto => ({
+  name: user.name,
+  lastName: user.lastName,
+  email: user.email,
+  password: '',
+  role: user.role,
+  phone: user.phone,
+  profession: user.profession,
+  address: user.address,
+  description: user.description,
+  education: user.education,
+  workExperience: user.workExperience,
+  abilities: user.abilities,
+  bornDate: user.bornDate,
+  cvPath: user.cvPath,
+  profileImagePath: user.profileImagePath,
+  googleAccount: user.googleAccount,
+  emailNotification: user.emailNotification,
+  presentationLetters: user.presentationLetters
+})

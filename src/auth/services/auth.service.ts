@@ -1,11 +1,16 @@
 import { AppServices } from '@/shared/services/api.service'
 import { StatusCodes } from 'http-status-codes'
 
-import { type User, type UserLogin, type UserToStorage } from '@/users/models/user.interface'
+import { type UserDto, type User, type UserLogin, type UserToStorage } from '@/users/models/user.interface'
 import { type LoginResponse } from '../response/login.response'
 import appStorage from '@/shared/config/storage'
 import cookiesStorage from '@/shared/config/storage/cookies'
 import { AUTH_STORAGE_KEY } from '../store/auth.store'
+
+export interface RegisterAsGoogle {
+  email: string
+  user?: UserDto
+}
 
 export class AuthServices extends AppServices {
   constructor () {
@@ -17,12 +22,13 @@ export class AuthServices extends AppServices {
       .then(response => {
         if (response.status === StatusCodes.CREATED) {
           const { tokens, authenticatedUser } = response.data
-          const { id, fullName, role } = authenticatedUser
+          const { id, fullName, role, emailNotification } = authenticatedUser
 
           const userStorage: UserToStorage = {
             id,
             fullName,
-            role
+            role,
+            emailNotification
           }
 
           cookiesStorage.setSessionExpiration()
@@ -43,6 +49,40 @@ export class AuthServices extends AppServices {
   logout = (): void => {
     appStorage.removeItem(AUTH_STORAGE_KEY)
     cookiesStorage.clearSessionExpiration()
+  }
+
+  register = async (user: UserDto): Promise<User> => {
+    return await this.post<User>('/register', user)
+      .then(response => response.data)
+  }
+
+  registerAsGoogle = async (googleDto: RegisterAsGoogle): Promise<{ user: UserToStorage | null, token: string | null }> => {
+    return await this.post<LoginResponse>('/google', googleDto)
+      .then(response => {
+        if (response.status === StatusCodes.CREATED) {
+          const { tokens, authenticatedUser } = response.data
+          const { id, fullName, role, emailNotification } = authenticatedUser
+
+          const userStorage: UserToStorage = {
+            id,
+            fullName,
+            role,
+            emailNotification
+          }
+
+          cookiesStorage.setSessionExpiration()
+
+          return {
+            user: userStorage,
+            token: tokens.accessToken
+          }
+        }
+
+        return {
+          user: null,
+          token: null
+        }
+      })
   }
 
   changePassword = async (id: string, dto: { password: string }): Promise<User> => {

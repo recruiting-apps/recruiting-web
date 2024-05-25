@@ -1,14 +1,18 @@
 import { AppServices } from '@/shared/services/api.service'
 import { type Offer, type OfferDto } from '../models/offer.interface'
+import { type ApplicationDto } from '../models/application.interface'
 
 export class OffersService extends AppServices {
   constructor () {
     super({ baseUrl: 'offers', contentType: 'application/json' })
   }
 
-  findAll = async (userId: string = ''): Promise<Offer[]> => {
+  findAll = async (userId: string = '', searchQuery: string = ''): Promise<Offer[]> => {
     return await this.get<Offer[]>('', {
-      params: { userId }
+      params: {
+        userId,
+        query: searchQuery
+      }
     })
       .then(response => response.data)
   }
@@ -50,8 +54,8 @@ export class OffersService extends AppServices {
       .then(response => response.data)
   }
 
-  apply = async (offerId: string): Promise<Offer> => {
-    return await this.post<Offer>(`/${offerId}/applications`)
+  apply = async (offerId: string, applicationDto: ApplicationDto): Promise<Offer> => {
+    return await this.post<Offer>(`/${offerId}/applications`, applicationDto)
       .then(response => response.data)
   }
 

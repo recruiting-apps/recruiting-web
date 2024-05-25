@@ -60,6 +60,12 @@ const MyApplicationsView: React.FC = () => {
                 <h3 className='font-bold text-lg'>{offer.title}</h3>
 
                 <div className='my-2'>
+                  <p>Presentation Letter sent:
+                    <span className='ml-2 font-semibold'>
+                      {application?.letter && application.letter.length > 0 ? 'Yes' : 'No'}
+                    </span>
+                  </p>
+
                   <p className='font-semibold'>Application status</p>
                   <span className={`${StatusColor[application?.status ?? Status.PENDING]} text-white py-1 px-3 rounded-md inline-block mt-2`}>{application?.status}</span>
                 </div>

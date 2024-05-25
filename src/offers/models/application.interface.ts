@@ -6,5 +6,12 @@ export interface Application {
   applicationDate: string
   status: Status
   comments: string
+  letter: string | null
   user: User
+}
+
+export interface ApplicationDto {
+  status?: Status
+  comments?: string
+  letter?: string
 }

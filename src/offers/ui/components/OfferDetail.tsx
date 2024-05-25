@@ -6,6 +6,11 @@ import { useToast } from '@/shared/hooks/useToast'
 import { useEffect, useState } from 'react'
 import { type Offer } from '@/offers/models/offer.interface'
 import { useOffersQuery } from '../hooks/useOffersQuery'
+import parse from 'html-react-parser'
+import { useBooleanState } from '@/shared/hooks/useBooleanState'
+import Modal from '@/shared/ui/components/utils/Modal'
+import { type PresentationLetter } from '@/users/models/user.interface'
+import { UsersService } from '@/users/services/users.service'
 
 interface OfferDetailProps {
   offer: Offer | null
@@ -16,29 +21,52 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
   const { user } = useAuth()
 
   const [canApply, setCanApply] = useState(false)
+  const [showApply, toggleShowApply] = useBooleanState()
+  const [presentationLetters, setPresentationLetters] = useState<PresentationLetter[]>([])
+  const [selectedPresentationLetter, setSelectedPresentationLetter] = useState<PresentationLetter | null>(null)
 
   useEffect(() => {
     if (!offer || !user) return
 
     const hasUserApplied = offer.applications.some(application => application.user.id === user.id)
 
-    const canApply = offer.user.id !== user.id && !hasUserApplied
+    const canApply = offer.user.id !== user.id && !hasUserApplied && !offer.closed
     setCanApply(canApply)
   }, [offer, user])
+
+  useEffect(() => {
+    if (!showApply || !user) return
+
+    void new UsersService().findById(user.id)
+      .then((response) => {
+        setPresentationLetters(response.presentationLetters)
+      })
+      .catch((error) => {
+        const { message } = error.data
+        useToast({ message, type: 'error' })
+      })
+  }, [showApply, user])
 
   const handleApply = () => {
     if (!offer) return
 
     void new OffersService()
-      .apply(offer.id)
+      .apply(offer.id, {
+        letter: selectedPresentationLetter?.content ?? undefined
+      })
       .then(async (response) => {
         await handleUpdateOffer(response)
+        toggleShowApply()
         useToast({ message: 'Applied successfully', type: 'success' })
       })
       .catch((error) => {
         const { message } = error.data
         useToast({ message, type: 'error' })
       })
+  }
+
+  const handleSelectPresentationLetter = (letter: PresentationLetter) => () => {
+    setSelectedPresentationLetter(letter.name === selectedPresentationLetter?.name ? null : letter)
   }
 
   return (
@@ -49,16 +77,46 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
           <p>{offer?.location}</p>
         </div>
         <div>
-          {canApply && <Button color='primary' onClick={handleApply}>Apply</Button>}
+          {canApply && <Button color='primary' onClick={toggleShowApply}>Apply</Button>}
         </div>
       </header>
+
+      <Modal isOpen={showApply} onClose={toggleShowApply}>
+        <h3 className='font-semibold text-center uppercase'>Apply to {offer?.title}</h3>
+        <p className='font-semibold text-center'>Are you sure you want to apply to this offer?</p>
+
+        {presentationLetters.length > 0 && (<>
+          <Divider className='my-[2]'></Divider>
+          <h3>Do you want to select a letter for this offer?</h3>
+          <ul>
+            {
+              presentationLetters.map(letter => (
+                <li
+                  className={`p-2  rounded-md cursor-pointer ${selectedPresentationLetter?.name === letter.name ? 'bg-blue-era text-white' : 'bg-gray-200'}`}
+                  key={letter.name} onClick={handleSelectPresentationLetter(letter)}>
+                  <p>{letter.name}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </>
+        )}
+
+        <div className='flex justify-end gap-2 mt-4'>
+          <Button color='danger' onClick={toggleShowApply}>Cancel</Button>
+          <Button color='primary' onClick={handleApply}>Apply</Button>
+        </div>
+      </Modal>
 
       <Divider className='my  -2' />
       <div className='[&>p]:font-semibold [&>p>span]:font-normal'>
         <p>Empresa: <span>{offer?.company}</span></p>
         {String(offer?.salary ?? '').length > 0 && <p>Salario: <span>{offer?.salary}</span></p>}
       </div>
-      <p className='' dangerouslySetInnerHTML={{ __html: offer?.description?.replace(/\n/g, '<br>') ?? '' }}></p>
+
+      <div>
+        {parse(offer?.description?.replace(/\n/g, '<br>') ?? '')}
+      </div>
 
       {
         offer && offer.expectedAbilities.length > 0 && (

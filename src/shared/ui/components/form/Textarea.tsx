@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 
 interface TextareaProps extends React.HTMLProps<HTMLTextAreaElement> {
   value?: string
+  resetFlag?: boolean
 }
 
 const Textarea: React.FC<TextareaProps> = ({
@@ -11,6 +12,7 @@ const Textarea: React.FC<TextareaProps> = ({
   required = true,
   placeholder,
   value,
+  resetFlag,
   onChange,
   disabled = false
 }) => {
@@ -20,6 +22,12 @@ const Textarea: React.FC<TextareaProps> = ({
   useEffect(() => {
     setVal(value)
   }, [value])
+
+  useEffect(() => {
+    if (resetFlag) {
+      setVal('')
+    }
+  }, [resetFlag])
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     const { value } = event.target
@@ -35,14 +43,14 @@ const Textarea: React.FC<TextareaProps> = ({
   }, [val, textareaRef])
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      <label htmlFor={name}>{label} {!required && <span className='text-red-600'>(opcional)</span>}</label>
+
+    <label>{label} {!required && <span className='text-red-600'>(opcional)</span>}
       <textarea
         ref={textareaRef}
-        className='block w-full h-24 min-h-[6rem] max-h-[300px] px-2 py-1 border border-gray-300 rounded-md border-solid outline-none focus:shadow-blue focus:shadow-input-focus disabled:bg-gray-200 disabled:text-gray-500'
-        disabled={disabled} id={name} name={name} placeholder={placeholder} value={val} onChange={handleChange} required={required}
+        className={`mt-1 block w-full h-24 min-h-[6rem] max-h-[300px] px-2 py-1 border border-gray-300 rounded-md border-solid outline-none focus:shadow-blue focus:shadow-input-focus disabled:bg-gray-200 disabled:text-gray-500 ${className}`}
+        disabled={disabled} name={name} placeholder={placeholder} value={val} onChange={handleChange} required={required}
       />
-    </div>
+    </label>
   )
 }
 

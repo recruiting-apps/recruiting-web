@@ -1,7 +1,7 @@
 import { type UserLogin, type UserToStorage } from '@/users/models/user.interface'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { AuthServices } from '../services/auth.service'
+import { AuthServices, type RegisterAsGoogle } from '../services/auth.service'
 import appStorage from '@/shared/config/storage'
 
 export const AUTH_STORAGE_KEY = 'userInfo'
@@ -13,6 +13,8 @@ interface AuthState {
 
   login: (credentials: UserLogin) => Promise<UserToStorage | null>
   logout: () => void
+  loginWithGoogle: (googleDto: RegisterAsGoogle) => Promise<UserToStorage | null>
+  toggleEmailNotification: () => void
 }
 
 type DefaultAuthState = Pick<AuthState, 'isAuthenticated' | 'user' | 'token'>
@@ -44,8 +46,35 @@ export const useAuthStore = create(
             return user
           })
       },
+      loginWithGoogle: async (googleDto) => {
+        const authService = new AuthServices()
+
+        return await authService.registerAsGoogle(googleDto)
+          .then(response => {
+            const { user, token } = response
+
+            set({
+              isAuthenticated: user !== null,
+              user,
+              token
+            })
+
+            return user
+          })
+      },
       logout: () => {
         set({ ...DEFAULT_STATE })
+      },
+      toggleEmailNotification: () => {
+        set(state => {
+          if (state.user) {
+            const user = { ...state.user, emailNotification: !state.user.emailNotification }
+
+            return { ...state, user }
+          }
+
+          return state
+        })
       }
     }
   },
