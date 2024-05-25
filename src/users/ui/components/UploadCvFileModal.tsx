@@ -45,7 +45,9 @@ const UploadCvFileModal: React.FC<UploadCvFileModalProps> = ({ isOpen, onClose, 
           password: '',
           phone: user.phone,
           role: user.role,
-          workExperience: user.workExperience
+          workExperience: user.workExperience,
+          emailNotification: user.emailNotification,
+          presentationLetters: user.presentationLetters
         }
 
         await new UsersService()

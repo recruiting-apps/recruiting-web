@@ -64,7 +64,9 @@ const EditProfileView: React.FC = () => {
       bornDate: new Date(formData.get('bornDate') as string),
       cvPath: user?.cvPath ?? '',
       profileImagePath: user?.profileImagePath ?? '',
-      googleAccount: user?.googleAccount ?? false
+      googleAccount: user?.googleAccount ?? false,
+      emailNotification: user?.emailNotification ?? false,
+      presentationLetters: user?.presentationLetters ?? []
     }
 
     await new UsersService()
