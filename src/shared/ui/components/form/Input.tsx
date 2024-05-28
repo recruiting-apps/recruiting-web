@@ -22,6 +22,7 @@ interface InputProps extends React.HTMLProps<HTMLInputElement> {
   value?: string
   placeholder?: string
   validations?: InputValidation[]
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 const Input: React.FC<InputProps> = ({

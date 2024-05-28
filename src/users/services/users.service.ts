@@ -11,6 +11,13 @@ export class UsersService extends AppServices {
       .then(response => response.data)
   }
 
+  findByAbilities = async (abilitiesQuery: string): Promise<User[]> => {
+    return await this.get<User[]>('/abilities', {
+      params: { abilities: abilitiesQuery }
+    })
+      .then(response => response.data)
+  }
+
   findByEmail = async (email: string): Promise<User | null> => {
     return await this.get<User | null>('/email', {
       params: { email }

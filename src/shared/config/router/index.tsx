@@ -14,6 +14,7 @@ import NotFoundPage from '@/shared/ui/pages/NotFoundPage'
 import { ConfigurationView } from '@/users/ui/pages/ConfigurationView'
 import EditProfileView from '@/users/ui/pages/EditProfileView'
 import ProfileView from '@/users/ui/pages/ProfileView'
+import SearchUsersView from '@/users/ui/pages/SearchUsersView'
 import { type RouteObject, createBrowserRouter, Navigate } from 'react-router-dom'
 
 const AUTH_REQUIRED_ROUTES: RouteObject[] = [
@@ -39,6 +40,16 @@ const AUTH_REQUIRED_ROUTES: RouteObject[] = [
       {
         path: 'edit/:id',
         element: <EditProfileView />
+      }
+    ]
+  },
+  {
+    path: 'applicants-search',
+    element: <RoleRequired />,
+    children: [
+      {
+        path: '',
+        element: <SearchUsersView />
       }
     ]
   },

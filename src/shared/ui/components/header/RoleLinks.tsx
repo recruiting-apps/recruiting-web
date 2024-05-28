@@ -4,7 +4,8 @@ import { Role } from '@/users/models/enum/role.enum'
 export const ROLE_LINKS: Record<Role, NavbarLink[]> = {
   [Role.ADMIN]: [
     { name: 'Offers', to: '/offers', isDropdown: false },
-    { name: 'Profile', to: '/profile', isDropdown: false }
+    { name: 'Profile', to: '/profile', isDropdown: false },
+    { name: 'Search Applicants', to: '/applicants-search', isDropdown: false }
   ],
   [Role.APPLICANT]: [
     { name: 'Offers', to: '/offers', isDropdown: false },
@@ -12,6 +13,7 @@ export const ROLE_LINKS: Record<Role, NavbarLink[]> = {
   ],
   [Role.RECRUITER]: [
     { name: 'Offers', to: '/offers', isDropdown: false },
-    { name: 'My Offers', to: '/my-offers', isDropdown: false }
+    { name: 'My Offers', to: '/my-offers', isDropdown: false },
+    { name: 'Search Applicants', to: '/applicants-search', isDropdown: false }
   ]
 }
