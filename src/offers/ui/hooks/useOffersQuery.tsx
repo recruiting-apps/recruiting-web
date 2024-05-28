@@ -11,7 +11,7 @@ export const useOffersQuery = () => {
   const queryClient = useQueryClient()
   const { pathname } = useLocation()
   const { user } = useAuth()
-  const [userId, setUserId] = useState<string>('')
+  const [userId, setUserId] = useState<number>(0)
 
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -23,7 +23,7 @@ export const useOffersQuery = () => {
   })
 
   useEffect(() => {
-    setUserId(pathname.includes('my-requests') ? user?.id ?? '' : '')
+    setUserId(pathname.includes('my-offers') ? user?.id ?? 0 : 0)
   }, [pathname])
 
   const handleUpdateOffer = async (offer: Offer) => {

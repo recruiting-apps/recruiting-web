@@ -9,7 +9,7 @@ export const ConfigurationView = () => {
 
   const handleToggleNotifications = () => {
     void new UsersService()
-      .toggleNotifications(user?.id ?? '', user?.emailNotification ?? false)
+      .toggleNotifications(user?.id ?? 0, user?.emailNotification ?? false)
       .then(() => {
         toggleEmailNotification()
         useToast({ type: 'success', message: 'Notifications updated' })

@@ -29,7 +29,7 @@ const AUTH_REQUIRED_ROUTES: RouteObject[] = [
     path: '/profile',
     children: [
       {
-        path: 'detail',
+        path: 'detail/:id?',
         element: <ProfileView />
       },
       {

@@ -24,7 +24,7 @@ const MyApplicationsView: React.FC = () => {
     const application = offer.applications.find(application => application.user.id === user?.id)
 
     void new OffersService()
-      .cancelApplication(offer.id, application?.id ?? '')
+      .cancelApplication(offer.id, application?.id ?? 0)
       .then((response) => {
         setOffers(offers.filter(offer => offer.id !== response.id))
         useToast({ message: 'Application canceled successfully', type: 'success' })

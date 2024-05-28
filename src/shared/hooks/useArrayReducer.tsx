@@ -1,14 +1,14 @@
 import { useCallback, useReducer } from 'react'
 
 interface TemplateType {
-  id: string
+  id: number
 }
 
 export type ReducerAction<T extends TemplateType> =
   | { type: 'set', payload: T[] }
   | { type: 'add', payload: T }
   | { type: 'update', payload: T }
-  | { type: 'remove', payload: string }
+  | { type: 'remove', payload: number }
 
 function anexoReducer <T extends TemplateType> (state: T[], action: ReducerAction<T>): T[] {
   switch (action.type) {
@@ -30,7 +30,7 @@ export function useArrayReducer <T extends TemplateType> (initialState: T[]): [
   (payload: T[]) => void,
   (payload: T) => void,
   (payload: T) => void,
-  (payload: string) => void
+  (payload: number) => void
 ] {
   const [state, dispatch] = useReducer(anexoReducer, initialState)
 
@@ -45,7 +45,7 @@ export function useArrayReducer <T extends TemplateType> (initialState: T[]): [
   const update = useCallback((payload: T) => {
     dispatch({ type: 'update', payload })
   }, [])
-  const remove = useCallback((payload: string) => {
+  const remove = useCallback((payload: number) => {
     dispatch({ type: 'remove', payload })
   }, [])
 

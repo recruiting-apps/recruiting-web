@@ -29,7 +29,7 @@ const EditProfileView: React.FC = () => {
     }
 
     void new UsersService()
-      .findById(id)
+      .findById(+id)
       .then((user) => {
         setUser(user)
         setDescription(user.description)
@@ -69,8 +69,9 @@ const EditProfileView: React.FC = () => {
       presentationLetters: user?.presentationLetters ?? []
     }
 
+    const userId = id ?? 0
     await new UsersService()
-      .update(userDto, id ?? '')
+      .update(userDto, +userId)
       .then(() => {
         useToast({ message: 'User updated successfully' })
         setTimeout(() => {
@@ -92,7 +93,7 @@ const EditProfileView: React.FC = () => {
           className='[&>section>fieldset]:mb-4 [&>section>fieldset]:border-[2px] [&>section>fieldset]:border-gray-200 [&>section>fieldset]:rounded-lg [&>section>fieldset]:p-5'
           onSubmit={(event) => { void onSubmit(event) }}
           submitText='Save changes'
-          onCancel={() => { navigate('/profile') }}
+          onCancel={() => { navigate(-1) }}
         >
           <section id='section-1'>
             <fieldset>

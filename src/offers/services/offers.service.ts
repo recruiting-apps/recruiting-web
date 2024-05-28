@@ -7,7 +7,7 @@ export class OffersService extends AppServices {
     super({ baseUrl: 'offers', contentType: 'application/json' })
   }
 
-  findAll = async (userId: string = '', searchQuery: string = ''): Promise<Offer[]> => {
+  findAll = async (userId: number = 0, searchQuery: string = ''): Promise<Offer[]> => {
     return await this.get<Offer[]>('', {
       params: {
         userId,
@@ -27,39 +27,44 @@ export class OffersService extends AppServices {
       .then(response => response.data)
   }
 
-  findById = async (id: string | undefined): Promise<Offer | null> => {
+  findById = async (id: number | undefined): Promise<Offer | null> => {
     if (!id) return null
 
     return await this.get<Offer>(`/${id}`)
       .then(response => response.data)
   }
 
-  update = async (offer: OfferDto, id: string): Promise<Offer> => {
+  update = async (offer: OfferDto, id: number): Promise<Offer> => {
     return await this.patch<Offer>(`/${id}`, offer)
       .then(response => response.data)
   }
 
-  close = async (id: string): Promise<Offer> => {
+  close = async (id: number): Promise<Offer> => {
     return await this.patch<Offer>(`/${id}`, { closed: true })
       .then(response => response.data)
   }
 
-  findBetterApplicant = async (id: string): Promise<Offer> => {
+  findBetterApplicant = async (id: number): Promise<Offer> => {
     return await this.post<Offer>(`/${id}/better-application`)
       .then(response => response.data)
   }
 
-  remove = async (id: string): Promise<Offer> => {
+  selectApplicant = async (offerId: number, applicationId: number): Promise<Offer> => {
+    return await this.patch<Offer>(`/${offerId}/applications/${applicationId}/select-application`)
+      .then(response => response.data)
+  }
+
+  remove = async (id: number): Promise<Offer> => {
     return await this.delete<Offer>(`/${id}`)
       .then(response => response.data)
   }
 
-  apply = async (offerId: string, applicationDto: ApplicationDto): Promise<Offer> => {
+  apply = async (offerId: number, applicationDto: ApplicationDto): Promise<Offer> => {
     return await this.post<Offer>(`/${offerId}/applications`, applicationDto)
       .then(response => response.data)
   }
 
-  cancelApplication = async (offerId: string, applicationId: string): Promise<Offer> => {
+  cancelApplication = async (offerId: number, applicationId: number): Promise<Offer> => {
     return await this.patch<Offer>(`/${offerId}/applications/${applicationId}`)
       .then(response => response.data)
   }

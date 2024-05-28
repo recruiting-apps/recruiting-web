@@ -17,5 +17,5 @@ export interface DataContextInterface<T> {
 
   add: (data: T) => void
   update: (data: T) => void
-  remove: (id: string) => void
+  remove: (id: number) => void
 }

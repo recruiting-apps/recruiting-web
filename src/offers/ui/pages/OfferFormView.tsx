@@ -63,7 +63,7 @@ const OfferFormView: React.FC<OfferFormViewProps> = ({ offerToEdit }) => {
 
     const actionFunc = action === 'add' ? offerService.create : offerService.update
 
-    void actionFunc(offer, offerToEdit?.id ?? '')
+    void actionFunc(offer, offerToEdit?.id ?? 0)
       .then(() => {
         useToast({ message: `Offer ${action === 'add' ? 'created' : 'updated'} successfully` })
 

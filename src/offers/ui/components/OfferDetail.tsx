@@ -11,6 +11,7 @@ import { useBooleanState } from '@/shared/hooks/useBooleanState'
 import Modal from '@/shared/ui/components/utils/Modal'
 import { type PresentationLetter } from '@/users/models/user.interface'
 import { UsersService } from '@/users/services/users.service'
+import { Role } from '@/users/models/enum/role.enum'
 
 interface OfferDetailProps {
   offer: Offer | null
@@ -25,12 +26,14 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
   const [presentationLetters, setPresentationLetters] = useState<PresentationLetter[]>([])
   const [selectedPresentationLetter, setSelectedPresentationLetter] = useState<PresentationLetter | null>(null)
 
+  const [applying, setApplying] = useState(false)
+
   useEffect(() => {
     if (!offer || !user) return
 
     const hasUserApplied = offer.applications.some(application => application.user.id === user.id)
 
-    const canApply = offer.user.id !== user.id && !hasUserApplied && !offer.closed
+    const canApply = offer.user.id !== user.id && !hasUserApplied && !offer.closed && user.role === Role.APPLICANT
     setCanApply(canApply)
   }, [offer, user])
 
@@ -50,6 +53,7 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
   const handleApply = () => {
     if (!offer) return
 
+    setApplying(true)
     void new OffersService()
       .apply(offer.id, {
         letter: selectedPresentationLetter?.content ?? undefined
@@ -62,6 +66,9 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
       .catch((error) => {
         const { message } = error.data
         useToast({ message, type: 'error' })
+      })
+      .finally(() => {
+        setApplying(false)
       })
   }
 
@@ -104,7 +111,7 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
 
         <div className='flex justify-end gap-2 mt-4'>
           <Button color='danger' onClick={toggleShowApply}>Cancel</Button>
-          <Button color='primary' onClick={handleApply}>Apply</Button>
+          <Button color='primary' isLoading={applying} onClick={handleApply}>Apply</Button>
         </div>
       </Modal>
 

@@ -85,7 +85,7 @@ export class AuthServices extends AppServices {
       })
   }
 
-  changePassword = async (id: string, dto: { password: string }): Promise<User> => {
+  changePassword = async (id: number, dto: { password: string }): Promise<User> => {
     return await this.patch<User>(`/${id}/change-password`, dto)
       .then(response => response.data)
   }

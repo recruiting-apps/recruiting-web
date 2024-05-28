@@ -1,3 +1,4 @@
+import { type AdditionalFile } from './additional-file.interface'
 import { type Role } from './enum/role.enum'
 
 export interface PresentationLetter {
@@ -6,7 +7,7 @@ export interface PresentationLetter {
 }
 
 export interface User {
-  id: string
+  id: number
   role: Role
 
   name: string
@@ -31,9 +32,10 @@ export interface User {
   emailNotification: boolean
 
   presentationLetters: PresentationLetter[]
+  files: AdditionalFile[]
 }
 
-export interface UserDto extends Omit<User, 'id' | 'fullName'> {
+export interface UserDto extends Omit<User, 'id' | 'fullName' | 'files'> {
   password: string
 }
 

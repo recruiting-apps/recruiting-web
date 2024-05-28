@@ -6,12 +6,15 @@ import Divider from '@/shared/ui/components/utils/Divider'
 import Button from '@/shared/ui/components/form/Button'
 import { useBooleanState } from '@/shared/hooks/useBooleanState'
 import UploadCvFileModal from '../components/UploadCvFileModal'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import parse from 'html-react-parser'
 import { Role } from '@/users/models/enum/role.enum'
 import PresentationLetterModal from '../components/PresentationLetterModal'
+import AdditionalFileSection from '../components/AdditionalFileSection'
+import { type AdditionalFile } from '@/users/models/additional-file.interface'
 
 const ProfileView: React.FC = () => {
+  const { id: userId } = useParams()
   const { user: currentUser } = useAuth()
 
   const navigate = useNavigate()
@@ -20,6 +23,7 @@ const ProfileView: React.FC = () => {
   const [showPresentationLetters, toggleShowPresentationLetters] = useBooleanState()
 
   const [imageError, setImageError] = useState(false)
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
 
   const hasCv = user && user?.cvPath.length > 0
 
@@ -28,16 +32,30 @@ const ProfileView: React.FC = () => {
   }
 
   useEffect(() => {
-    if (!currentUser) return
+    const id = userId ?? currentUser?.id
 
-    const { id } = currentUser
+    if (!id) return
 
     void new UsersService()
-      .findById(id)
+      .findById(+id)
       .then((response) => {
         setUser(response)
       })
-  }, [])
+  }, [userId, currentUser])
+
+  useEffect(() => {
+    if (userId === undefined && currentUser !== null) {
+      setIsOwnProfile(true)
+      return
+    }
+
+    if (userId !== undefined && currentUser?.id === +userId) {
+      setIsOwnProfile(true)
+      return
+    }
+
+    setIsOwnProfile(false)
+  }, [currentUser, user])
 
   const handleDownloadCV = () => {
     if (!user) return
@@ -62,16 +80,25 @@ const ProfileView: React.FC = () => {
     setUser(updatedUser)
   }
 
+  const onAddFile = (file: AdditionalFile) => {
+    if (!user) return
+
+    setUser({
+      ...user,
+      files: [...user.files, file]
+    })
+  }
+
   return (
     <div className='max-h-screen mb-5'>
       <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-semibold uppercase'>Profile</h1>
 
         <div className='flex gap-2 items-center'>
-          {user?.role === Role.APPLICANT &&
+          {user?.role === Role.APPLICANT && isOwnProfile &&
             <Button color='secondary' onClick={toggleShowPresentationLetters}>Presentation Letters</Button>
           }
-          <Button color={'primary'} onClick={handleEdit}>Edit profile</Button>
+          {isOwnProfile && <Button color={'primary'} onClick={handleEdit}>Edit profile</Button>}
         </div>
       </div>
 
@@ -80,7 +107,6 @@ const ProfileView: React.FC = () => {
       <div className='grid grid-cols-[1fr_3fr] gap-3'>
         <section className='shadow-card py-5 px-4 rounded-md'>
           <div className='w-[250px] h-[250px] mx-auto'>
-
             {imageError
               ? (
                 <img
@@ -96,7 +122,6 @@ const ProfileView: React.FC = () => {
                   onError={handleImageError}
                 />
                 )}
-
           </div>
 
           <Divider className='mt-2 mb-2'></Divider>
@@ -116,17 +141,14 @@ const ProfileView: React.FC = () => {
 
           <p>Phone: {user?.phone}</p>
           <p>Address: {user?.address}</p>
-
         </section>
 
         <div>
-
           <main className='shadow-card px-6 py-4 rounded-md [&>h3]:uppercase [&>h3]:font-semibold'>
-
             <div className='flex justify-between items-center'>
               <h2 className='text-lg uppercase font-semibold'>Professional Information</h2>
               <div className='flex gap-2'>
-                <Button color='primary' onClick={toggleShowUploadCV}>{hasCv ? 'Edit CV' : 'Upload CV'}</Button>
+                {isOwnProfile && <Button color='primary' onClick={toggleShowUploadCV}>{hasCv ? 'Edit CV' : 'Upload CV'}</Button>}
                 {hasCv && <Button color='primary' onClick={handleDownloadCV}>Download CV</Button>}
               </div>
             </div>
@@ -146,7 +168,7 @@ const ProfileView: React.FC = () => {
             <h3>Work Experience</h3>
             <div>
               {
-                user?.education?.length === 0 &&
+                user?.workExperience?.length === 0 &&
                 <p>No work experience found</p>
               }
               {parse(user?.workExperience?.replace(/\n/g, '<br>') ?? '')}
@@ -170,11 +192,12 @@ const ProfileView: React.FC = () => {
               }
             </div>
           </main>
-          <div className='shadow-card px-6 py-4 rounded-md mt-5 [&>h3]:uppercase [&>h3]:font-semibold'>
-            <h3>Additional Documents</h3>
-          </div>
-        </div>
 
+          <AdditionalFileSection
+            onAddFile={onAddFile}
+            files={user?.files ?? []} isOwnProfile={isOwnProfile}
+          />
+        </div>
       </div>
 
       {user && <UploadCvFileModal user={user} isOpen={showUploadCV} onClose={toggleShowUploadCV} />}

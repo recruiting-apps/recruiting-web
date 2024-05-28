@@ -18,7 +18,7 @@ export class UsersService extends AppServices {
       .then(response => response.data)
   }
 
-  findById = async (id: string): Promise<User> => {
+  findById = async (id: number): Promise<User> => {
     return await this.get<User>(`/${id}`)
       .then(response => response.data)
   }
@@ -28,12 +28,12 @@ export class UsersService extends AppServices {
       .then(response => response.data)
   }
 
-  toggleNotifications = async (id: string, emailNotification: boolean): Promise<User> => {
+  toggleNotifications = async (id: number, emailNotification: boolean): Promise<User> => {
     return await this.patch<User>(`/${id}`, { emailNotification: !emailNotification })
       .then(response => response.data)
   }
 
-  update = async (userDto: UserDto, id: string): Promise<User> => {
+  update = async (userDto: UserDto, id: number): Promise<User> => {
     const { password, ...user } = userDto
     return await this.patch<User>(`/${id}`, user)
       .then(response => response.data)

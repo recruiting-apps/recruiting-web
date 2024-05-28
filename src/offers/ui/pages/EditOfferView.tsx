@@ -16,7 +16,7 @@ const EditOfferView: React.FC = () => {
     }
 
     void new OffersService()
-      .findById(id)
+      .findById(+id)
       .then((offer) => {
         console.log(offer)
         setOffer(offer)

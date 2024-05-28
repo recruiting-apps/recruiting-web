@@ -2,7 +2,7 @@ import { type User } from '@/users/models/user.interface'
 import { type Application } from './application.interface'
 
 export interface Offer {
-  id: string
+  id: number
 
   title: string
   description: string

@@ -50,10 +50,10 @@ const OffersView: React.FC = () => {
           <button type='submit' className='hidden'></button>
         </form>
       </header>
-      <div className={`grid ${selectedOffer ? 'grid-cols-[40%_60%]' : ''} gap-2 h-auto max-h-[700px] overflow-hidden`}>
+      <div className={`grid ${selectedOffer ? 'grid-cols-[40%_60%]' : ''} gap-2 px-2 h-auto max-h-[calc(100vh-150px)] overflow-hidden transition-all duration-200`}>
         <div>
           <Divider className='mt-1' />
-          <main className={`px-2 overflow-y-auto ${!selectedOffer && 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4'}`}>
+          <main className={`px-2  max-h-[calc(100vh-150px)] overflow-y-auto ${!selectedOffer && 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4'}`}>
             {
               offers.length === 0 && (
                 <div className='bg-gray-100 border p-3 rounded-md'>
@@ -65,10 +65,11 @@ const OffersView: React.FC = () => {
             {
               offers.map(offer => <OfferCard key={offer.id} offer={offer} handleClick={handleOfferClick} isSelected={offer.id === selectedOffer?.id} />)
             }
+
           </main>
         </div>
 
-        <aside className={`${selectedOffer ? 'visible opacity-100' : 'invisible opacity-0'} px-3 py-2 overflow-y-auto transition-[opacity] duration-300 ease-in`}>
+        <aside className={`${selectedOffer ? 'visible opacity-100' : 'invisible opacity-0'} px-2 py-2 max-h-[calc(100vh-150px)] overflow-y-auto transition-[opacity] duration-300 ease-in`}>
           <OfferDetail
             offer={selectedOffer}
           />
