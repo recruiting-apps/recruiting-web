@@ -6,3 +6,7 @@ export interface LoginResponse {
   }
   authenticatedUser: User
 }
+
+export interface GoogleLoginResponse extends Pick<LoginResponse, 'tokens'> {
+  authenticatedUser: User | null
+}

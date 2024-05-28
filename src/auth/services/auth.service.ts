@@ -2,14 +2,13 @@ import { AppServices } from '@/shared/services/api.service'
 import { StatusCodes } from 'http-status-codes'
 
 import { type UserDto, type User, type UserLogin, type UserToStorage } from '@/users/models/user.interface'
-import { type LoginResponse } from '../response/login.response'
+import { type GoogleLoginResponse, type LoginResponse } from '../response/login.response'
 import appStorage from '@/shared/config/storage'
 import cookiesStorage from '@/shared/config/storage/cookies'
 import { AUTH_STORAGE_KEY } from '../store/auth.store'
 
 export interface RegisterAsGoogle {
   email: string
-  user?: UserDto
 }
 
 export class AuthServices extends AppServices {
@@ -57,10 +56,12 @@ export class AuthServices extends AppServices {
   }
 
   registerAsGoogle = async (googleDto: RegisterAsGoogle): Promise<{ user: UserToStorage | null, token: string | null }> => {
-    return await this.post<LoginResponse>('/google', googleDto)
+    return await this.post<GoogleLoginResponse>('/google', googleDto)
       .then(response => {
         if (response.status === StatusCodes.CREATED) {
           const { tokens, authenticatedUser } = response.data
+          if (!authenticatedUser) return { user: null, token: null }
+
           const { id, fullName, role, emailNotification } = authenticatedUser
 
           const userStorage: UserToStorage = {

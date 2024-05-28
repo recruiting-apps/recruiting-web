@@ -1,3 +1,4 @@
+import GoogleRegisterView from '@/auth/ui/pages/GoogleRegisterView'
 import LoginView from '@/auth/ui/pages/LoginView'
 import RegisterView from '@/auth/ui/pages/RegisterView'
 import EditOfferView from '@/offers/ui/pages/EditOfferView'
@@ -93,6 +94,10 @@ export const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterView />
+  },
+  {
+    path: '/google-register',
+    element: <GoogleRegisterView />
   },
   {
     path: '/',

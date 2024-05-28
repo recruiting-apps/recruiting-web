@@ -9,9 +9,11 @@ import Divider from '@/shared/ui/components/utils/Divider'
 import { useNavigate } from 'react-router-dom'
 import { handleLoginWithGoogle } from '@/shared/config/firebase/auth'
 import { Role } from '@/users/models/enum/role.enum'
+import { useLoginUser } from '@/auth/store/login.store'
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate()
+  const { updateUser } = useLoginUser(state => state)
   const [loading, setLoading] = useState(false)
   const { login, loginWithGoogle } = useAuth()
 
@@ -76,7 +78,15 @@ const LoginForm: React.FC = () => {
           presentationLetters: []
         }
 
-        await loginWithGoogle({ email: email ?? '', user: userDto })
+        updateUser(userDto)
+
+        await loginWithGoogle({ email: email ?? '' })
+          .then((response) => {
+            if (response === null) {
+              useToast({ type: 'success', message: 'Bienvenido' })
+              navigate('/google-register')
+            }
+          })
           .catch((error) => {
             const { message } = error.data
             useToast({ type: 'error', message })
