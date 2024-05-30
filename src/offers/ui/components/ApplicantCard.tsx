@@ -41,6 +41,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
         <h4 className='font-bold'>{application.user.fullName}</h4>
       </header>
       <p>{application.user.email}</p>
+      <p className='text-sm'>Order: {application.order + 1}</p>
 
       <p className='text-sm font-semibold'>{moment(application.applicationDate).fromNow()}</p>
 
