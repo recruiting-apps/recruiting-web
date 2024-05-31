@@ -9,7 +9,7 @@ import UploadProfileImage from './UploadProfileImage'
 import UploadCvPdf from './UploadCvPdf'
 import Button from '@/shared/ui/components/form/Button'
 import { type UserDto } from '@/users/models/user.interface'
-import { type Role } from '@/users/models/enum/role.enum'
+import { Role } from '@/users/models/enum/role.enum'
 import { uploadFile } from '@/shared/config/firebase/storage'
 import { useToast } from '@/shared/hooks/useToast'
 import { useNavigate } from 'react-router-dom'
@@ -20,6 +20,7 @@ const RegisterForm: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null)
   const [currentSection, setCurrentSection] = useState(1)
 
+  const [role, setRole] = useState<Role>(Role.APPLICANT)
   const [description, setDescription] = useState('')
   const [education, setEducation] = useState('')
   const [workExperience, setWorkExperience] = useState('')
@@ -180,10 +181,14 @@ const RegisterForm: React.FC = () => {
             <SelectInput<string>
               label='Role'
               name='role'
+              value={role}
               objects={[
-                'recruiter',
-                'applicant'
+                Role.APPLICANT,
+                Role.RECRUITER
               ]}
+              onChange={(value) => {
+                setRole(value as Role)
+              }}
             />
 
             <UploadProfileImage

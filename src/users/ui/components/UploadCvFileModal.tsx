@@ -77,7 +77,7 @@ const UploadCvFileModal: React.FC<UploadCvFileModalProps> = ({ isOpen, onClose, 
 
       <div className='flex gap-2 justify-end'>
         <Button color='primary' onClick={() => { void onConfirm() }} isLoading={loading}>Confirm Upload CV</Button>
-        <Button color='secondary'>Cancel</Button>
+        <Button color='secondary' onClick={onClose}>Cancel</Button>
       </div>
 
     </Modal>
