@@ -1,32 +1,36 @@
+import { useState } from 'react'
 import { useAuth } from '@/auth/hooks/useAuth'
-import { uploadFile } from '@/shared/config/firebase/storage'
+import { deleteFile, uploadFile } from '@/shared/config/firebase/storage'
 import { useBooleanState } from '@/shared/hooks/useBooleanState'
 import { useToast } from '@/shared/hooks/useToast'
-import { DownloadFileIcon } from '@/shared/ui/assets/icons/AppIcons'
+import { DeleteIcon, DownloadFileIcon } from '@/shared/ui/assets/icons/AppIcons'
 import Button from '@/shared/ui/components/form/Button'
 import FileInput from '@/shared/ui/components/form/FileInput'
 import Divider from '@/shared/ui/components/utils/Divider'
 import Modal from '@/shared/ui/components/utils/Modal'
 import { type AdditionalFile } from '@/users/models/additional-file.interface'
 import { AdditionalFilesService } from '@/users/services/files.service'
-import { useState } from 'react'
 
 interface AdditionalFileSectionProps {
   files: AdditionalFile[]
   isOwnProfile: boolean
+  onRemoveFile: (id: number) => void
   onAddFile: (additionalFile: AdditionalFile) => void
 }
 
-const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, isOwnProfile, onAddFile }) => {
+const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, isOwnProfile, onAddFile, onRemoveFile }) => {
   const { user } = useAuth()
-  const [showAdditionalFile, toggleShowAdditionalFile] = useBooleanState()
+  const [selectedFile, setSelectedFile] = useState<AdditionalFile | null>(null)
   const [file, setFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [showAdditionalFile, toggleShowAdditionalFile] = useBooleanState()
+  const [showRemoveFile, toggleShowRemoveFile] = useBooleanState()
 
   const handleUpload = async () => {
     if (!file) return
 
-    setIsUploading(true)
+    setIsLoading(true)
     await uploadFile(file, `/users/${user?.id}/additional-files`)
       .then(async ({ originalName, url }) => {
         await new AdditionalFilesService()
@@ -46,7 +50,34 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
       .finally(() => {
         setFile(null)
         toggleShowAdditionalFile()
-        setIsUploading(false)
+        setIsLoading(false)
+      })
+  }
+
+  const handleDelete = async () => {
+    if (!selectedFile) return
+
+    setIsLoading(true)
+    await deleteFile(selectedFile.path)
+      .then(async () => {
+        await new AdditionalFilesService()
+          .remove(selectedFile.id)
+          .then(() => {
+            onRemoveFile(selectedFile.id)
+            useToast({ message: 'File removed successfully' })
+          })
+          .catch((error) => {
+            const { message } = error.data
+            useToast({ message, type: 'error' })
+          })
+      })
+      .catch((error) => {
+        useToast({ message: error.message, type: 'error' })
+      })
+      .finally(() => {
+        setFile(null)
+        toggleShowRemoveFile()
+        setIsLoading(false)
       })
   }
 
@@ -65,16 +96,27 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
             <ul className='grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mt-5'>
               {files.map((file) => (
                 <li key={file.id}
-                  className='px-3 py-1 bg-gray-200 rounded-md'
+                  className='px-3 py-2 bg-gray-200 rounded-md'
                 >
-                  <a
-                    className='flex gap-1 justify-between items-center'
-                    href={file.path} target='_blank' rel="noreferrer">
+                  <div className='flex gap-1 justify-between items-center'>
                     <p>{file.name}</p>
-                    <DownloadFileIcon
-                      className='w-6 h-6'
-                    />
-                  </a>
+
+                    <div className='flex gap-2 items-center'>
+                      <DeleteIcon
+                        onClick={() => {
+                          setSelectedFile(file)
+                          toggleShowRemoveFile()
+                        }}
+                        className='w-6 h-6 hover:text-red cursor-pointer'
+                      />
+                      <a
+                        href={file.path} target='_blank' rel="noreferrer">
+                        <DownloadFileIcon
+                          className='w-6 h-6 hover:text-blue'
+                        />
+                      </a>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -83,6 +125,16 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
             <p>No files uploaded</p>
             )
       }
+
+      <Modal isOpen={showRemoveFile} onClose={toggleShowRemoveFile}>
+        <h3 className='text-center uppercase'>Are you sure you want to delete this additional file?</h3>
+        <p className='  text-center font-semibold'>{selectedFile?.name}</p>
+
+        <div className='flex justify-center items-center gap-5 mt-4'>
+          <Button color='danger' isLoading={isLoading} onClick={() => { void handleDelete() }}>Confirm</Button>
+          <Button color='secondary' onClick={toggleShowRemoveFile}>Cancel</Button>
+        </div>
+      </Modal>
 
       <Modal isOpen={showAdditionalFile} onClose={toggleShowAdditionalFile}>
         <h3 className='text-center uppercase font-semibold'>Add new file</h3>
@@ -97,7 +149,7 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
         <footer className='flex gap-2 items-center mt-4'>
           <Button color='primary'
             onClick={() => { void handleUpload() }}
-            isLoading={isUploading}
+            isLoading={isLoading}
           >Upload</Button>
           <Button color='danger'
             onClick={() => {

@@ -89,6 +89,15 @@ const ProfileView: React.FC = () => {
     })
   }
 
+  const onRemoveFile = (id: number) => {
+    if (!user) return
+
+    setUser({
+      ...user,
+      files: user.files.filter(file => file.id !== id)
+    })
+  }
+
   return (
     <div className='max-h-screen mb-5'>
       <div className='flex justify-between items-center'>
@@ -194,6 +203,7 @@ const ProfileView: React.FC = () => {
           </main>
 
           <AdditionalFileSection
+            onRemoveFile={onRemoveFile}
             onAddFile={onAddFile}
             files={user?.files ?? []} isOwnProfile={isOwnProfile}
           />
