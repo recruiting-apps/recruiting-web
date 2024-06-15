@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-const EXPIRATION_TIME = import.meta.env.VITE_AUTH_EXPIRATION_TIME ?? 10
+const EXPIRATION_TIME = import.meta.env.VITE_AUTH_EXPIRATION_TIME ?? 36000
 const EXPIRATION_LABEL = 'auth'
 
 class CookiesStorage {
