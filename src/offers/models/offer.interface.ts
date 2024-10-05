@@ -10,6 +10,7 @@ export interface Offer {
   location: string
   salary: string | number
 
+  sorted: boolean
   closed: boolean
   publicationDate: string
   expirationDate: string

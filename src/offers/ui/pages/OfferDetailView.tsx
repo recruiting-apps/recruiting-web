@@ -96,10 +96,11 @@ const OfferDetailView: React.FC = () => {
           <div className='shadow-card-bold rounded-md p-4'>
             <div className='flex justify-between items-center'>
               <h3 className='text-xl font-semibold'>Find the best applicant</h3>
-              {betterApplicant === null && <Button isLoading={isFinding} color='primary' onClick={findBetterApplicant}>Sort Applications</Button>}
+              {!offer.sorted && <Button isLoading={isFinding} color='primary' onClick={findBetterApplicant}>Sort Applications</Button>}
             </div>
             <Divider className='my-2' />
-            <p className=''>We will sort all applications depending on their skills coincidence. You can decide easily!</p>
+            {!offer.sorted && <p className=''>We will sort all applications depending on their skills coincidence. You can decide easily!</p>}
+            {offer.sorted && <p className=''>Applications have been sorted. The best applicant is the first one. Now you can decide!</p>}
             {
               betterApplicant && (
                 <div className='flex flex-col gap-2'>
