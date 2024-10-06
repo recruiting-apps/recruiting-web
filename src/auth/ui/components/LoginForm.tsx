@@ -20,6 +20,7 @@ const LoginForm: React.FC = () => {
   const handleLogin = async (user: UserLogin) => {
     await login(user)
       .catch((error) => {
+        console.log(error)
         const { message } = error.data
         useToast({ type: 'error', message })
       })
