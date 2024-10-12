@@ -21,4 +21,4 @@ export interface Offer {
   applications: Application[]
 }
 
-export interface OfferDto extends Omit<Offer, 'id' | 'user' | 'applications'> {}
+export interface OfferDto extends Omit<Offer, 'id' | 'user' | 'applications' | 'sorted'> {}

@@ -56,8 +56,7 @@ const OfferFormView: React.FC<OfferFormViewProps> = ({ offerToEdit }) => {
       publicationDate: moment().format('YYYY-MM-DD'),
       salary: formData.get('salary') as string,
       title: formData.get('title') as string,
-      closed: false,
-      sorted: false
+      closed: false
     }
 
     const offerService = new OffersService()
