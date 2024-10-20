@@ -19,7 +19,8 @@ export const useOffersQuery = () => {
     queryKey: [OFFERS_KEY, userId, searchQuery],
     queryFn: async () => await new OffersService().findAll(userId, searchQuery),
     placeholderData: keepPreviousData,
-    retry: 2
+    retry: 2,
+    refetchOnWindowFocus: false
   })
 
   useEffect(() => {

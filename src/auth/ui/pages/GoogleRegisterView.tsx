@@ -41,7 +41,7 @@ const GoogleRegisterView: React.FC = () => {
       .then(async () => {
         await login({ email: user.email, password: user.password })
           .then(() => {
-            navigate('/')
+            navigate('/profile/detail')
           })
         useToast({ type: 'success', message: 'Registration completed! Welcome!' })
       })

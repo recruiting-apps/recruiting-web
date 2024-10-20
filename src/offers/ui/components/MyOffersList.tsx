@@ -21,6 +21,8 @@ const MyOffersList: React.FC = () => {
 
             <h3 className='font-bold'>{offer.title}</h3>
 
+            <p className='uppercase text-sm'>Status: {offer.closed ? 'Close' : 'Open'}</p>
+
             {offer.expectedAbilities.length > 0 && (
               <div className='my-2'>
                 <h4 className='font-semibold'>Expected Abilities: </h4>

@@ -127,8 +127,8 @@ const PresentationLetterModal: React.FC<PresentationLetterProps> = ({ isOpen, on
                   <Button color='primary' onClick={() => {
                     setShowForm(true)
                     setPresentationLetter(letter)
-                  }}>Editar</Button>
-                  <Button color='danger' onClick={handleDelete(letter.name)}>Eliminar</Button>
+                  }}>Edit</Button>
+                  <Button color='danger' onClick={handleDelete(letter.name)}>Remove</Button>
                 </div>
               }
             </header>

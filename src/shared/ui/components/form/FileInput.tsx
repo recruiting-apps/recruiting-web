@@ -31,12 +31,12 @@ const InputFile: React.FC<InputFileProps> = ({
     const ext = name.substring(lastDot + 1)
 
     if (!admittedExtensions.includes(ext)) {
-      useToast({ message: 'El archivo no tiene una extensión válida', type: 'error' })
+      useToast({ message: `File must be ${admittedExtensions.join(' ')}`, type: 'error' })
       return
     }
 
-    if (maxSize && file.size > maxSize * 1024) {
-      useToast({ message: `El archivo excede el tamaño máximo permitido de ${maxSize}MB`, type: 'error' })
+    if (maxSize && file.size > maxSize * 1024 * 1024) {
+      useToast({ message: `Max size is ${maxSize}MB`, type: 'error' })
       return
     }
 
@@ -45,9 +45,9 @@ const InputFile: React.FC<InputFileProps> = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <p>Inserte un archivo</p>
+      <p>Select a file</p>
       <label htmlFor="fileInput" className={`px-4 py-2 border ${file ? 'bg-gray-300' : 'border-gray-300'} rounded-lg cursor-pointer flex justify-between`}>
-        <span>{file ? file.name : 'Seleccionar archivo'}</span>
+        <span>{file ? file.name : 'Select a file'}</span>
         <UploadFileIcon className='w-5 h-5' />
       </label>
       <input
@@ -57,6 +57,7 @@ const InputFile: React.FC<InputFileProps> = ({
         onChange={handleChange}
         className="hidden"
         disabled={disabled}
+        accept={admittedExtensions.map((ext) => `.${ext}`).join(',')}
       />
     </div>
   )

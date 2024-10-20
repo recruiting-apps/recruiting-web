@@ -9,6 +9,8 @@ import { useOfferDetailQuery } from '../hooks/useOfferDetailQuery'
 import { OffersService } from '@/offers/services/offers.service'
 import { useToast } from '@/shared/hooks/useToast'
 import { Link } from 'react-router-dom'
+import { handleDownloadFormUrl } from '@/utils'
+import { useLoading } from '@/shared/hooks/useLoading'
 
 interface ApplicantCardProps {
   application: Application
@@ -18,6 +20,12 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
   const { offer, refetch, betterApplicant } = useOfferDetailQuery()
   const [showLetter, toggleShowLetter] = useBooleanState()
   const [showModal, toggleShowModal] = useBooleanState()
+
+  const {
+    loading,
+    startLoading,
+    stopLoading
+  } = useLoading({})
 
   const handleSelectApplicant = () => {
     void new OffersService()
@@ -35,6 +43,13 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
       })
   }
 
+  const handleDownloadCV = () => {
+    const url = application.user?.cvPath
+    startLoading()
+    void handleDownloadFormUrl(url, `CV-${application.user?.fullName}`)
+      .finally(stopLoading)
+  }
+
   return (
     <div className={`${application.status === Status.ACCEPTED ? 'bg-success text-white' : 'bg-gray-100'} border p-3 rounded-md hover:border-blue-era transition-all duration-100 mb-2`}>
       <header>
@@ -46,14 +61,15 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
       <p className='text-sm font-semibold'>{moment(application.applicationDate).fromNow()}</p>
 
       <footer className='flex items-center justify-end gap-1'>
+        <Button color='primary' className='text-xs' onClick={handleDownloadCV} isLoading={loading}>Download CV</Button>
         {
           application.letter !== null && application.letter.length > 0 && (
             <Button color='primary' className='text-xs' onClick={toggleShowLetter}>Show Presentation Letter</Button>
           )
         }
         <Link to={`/profile/detail/${application.user.id}`}>
-        <Button color='secondary' className='text-xs '>Show Profile</Button>
-      </Link>
+          <Button color='secondary' className='text-xs '>Show Profile</Button>
+        </Link>
 
         {betterApplicant === null && <Button className='text-xs' color='primary' onClick={toggleShowModal}>
           Select Applicant

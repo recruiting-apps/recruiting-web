@@ -13,11 +13,22 @@ const UploadCvPdf: React.FC<UploadCvPdfProps> = ({ file, setCvFile }) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
 
-    const extension = file?.name.split('.').pop()
+    if (!file) {
+      setCvFile(null)
+      useToast({ type: 'error', message: 'No file selected' })
+      return
+    }
+
+    const extension = file.name.split('.').pop()
 
     if (extension !== 'pdf') {
       useToast({ type: 'error', message: 'El archivo debe ser un PDF' })
       setCvFile(null)
+      return
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      useToast({ message: 'Max size is 4MB', type: 'error' })
       return
     }
 
@@ -38,6 +49,7 @@ const UploadCvPdf: React.FC<UploadCvPdfProps> = ({ file, setCvFile }) => {
           type='file'
           className='hidden'
           onChange={handleImageChange}
+          accept='.pdf'
         />
       </label>
       {

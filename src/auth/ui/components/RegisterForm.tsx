@@ -95,19 +95,19 @@ const RegisterForm: React.FC = () => {
       presentationLetters: []
     }
 
-    if (!imageFile || !cvFile) {
-      useToast({ message: 'You must upload your profile image and your CV', type: 'error' })
+    if (!imageFile) {
+      useToast({ message: 'You must upload your profile image', type: 'error' })
       return
     }
 
     await Promise.all([
       uploadFile(imageFile, 'profile-images'),
-      uploadFile(cvFile, 'cv')
+      cvFile && uploadFile(cvFile, 'cv')
     ]).then(async (response) => {
       const [profileImage, cv] = response
 
       userDto.profileImagePath = profileImage.url
-      userDto.cvPath = cv.url
+      userDto.cvPath = cv ? cv.url : ''
 
       await new AuthServices()
         .register(userDto)

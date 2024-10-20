@@ -75,7 +75,7 @@ const EditProfileView: React.FC = () => {
       .then(() => {
         useToast({ message: 'User updated successfully' })
         setTimeout(() => {
-          navigate('/profile')
+          navigate('/profile/detail')
         }, 2000)
       })
       .catch((error) => {

@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { useOffersQuery } from '../hooks/useOffersQuery'
 import OfferCard from '../components/OfferCard'
 import { SearchIcon } from '@/shared/ui/assets/icons/AppIcons'
+import { OffersService } from '@/offers/services/offers.service'
+import { useToast } from '@/shared/hooks/useToast'
 
 const OffersView: React.FC = () => {
   const { offers, onSearch } = useOffersQuery()
@@ -20,6 +22,22 @@ const OffersView: React.FC = () => {
 
   const handleOfferClick = (offer: Offer) => {
     setOffer(offer.id === selectedOffer?.id ? null : offer)
+
+    if (offer.id !== selectedOffer?.id) {
+      void new OffersService().findById(offer.id)
+        .then(async (response) => {
+          if (response?.closed) {
+            setOffer(null)
+            useToast({ message: 'This offer is unavailable', type: 'error' })
+          }
+          setOffer(response)
+        })
+        .catch((error) => {
+          const { message } = error.data
+          setOffer(null)
+          useToast({ message, type: 'error' })
+        })
+    }
   }
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
@@ -57,7 +75,7 @@ const OffersView: React.FC = () => {
             {
               offers.length === 0 && (
                 <div className='bg-gray-100 border p-3 rounded-md'>
-                  <p className='text-center'>No offers available</p>
+                  <p className='text-center'>No offers available at this moment</p>
                 </div>
               )
             }

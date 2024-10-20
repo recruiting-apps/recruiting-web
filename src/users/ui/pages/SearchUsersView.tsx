@@ -4,13 +4,15 @@ import Input from '@/shared/ui/components/form/Input'
 import Divider from '@/shared/ui/components/utils/Divider'
 import { type User } from '@/users/models/user.interface'
 import { UsersService } from '@/users/services/users.service'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const SearchUsersView: React.FC = () => {
   const [users, setUsers] = useState<User[]>([])
   const [search, setSearch] = useState('')
   const [searching, setSearching] = useState(false)
+
+  const hasSearch = useRef(false)
 
   const onSearch = async () => {
     if (searching) return
@@ -21,6 +23,7 @@ const SearchUsersView: React.FC = () => {
     await new UsersService()
       .findByAbilities(search)
       .then((response) => {
+        hasSearch.current = true
         setUsers(response)
         const message = response.length > 0 ? 'Users found' : 'No users found'
         useToast({ message, type: 'success' })
@@ -78,12 +81,19 @@ const SearchUsersView: React.FC = () => {
             onClick={() => {
               setSearch('')
               setUsers([])
+              hasSearch.current = false
             }}
           >
             Clean
           </Button>
         </footer>
       </form>
+
+      {
+        hasSearch.current && users.length === 0 && (
+          <p className='mt-5 text-center bg-gray-200 rounded-md py-2'>No users with abilities that match search</p>
+        )
+      }
 
       <ul className='mt-5 grid grid-cols-responsive gap-5'>
         {users.map((user) => (

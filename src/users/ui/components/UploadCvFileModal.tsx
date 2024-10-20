@@ -61,8 +61,13 @@ const UploadCvFileModal: React.FC<UploadCvFileModalProps> = ({ isOpen, onClose, 
       .finally(stopLoading)
   }
 
+  const handleClose = () => {
+    setFile(null)
+    onClose()
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
 
       <h1 className='text-center text-2xl font-semibold'>Upload your CV</h1>
       <p className='text-gray-500 text-center mt-2'>Upload your CV to apply for the job offer</p>
@@ -77,7 +82,7 @@ const UploadCvFileModal: React.FC<UploadCvFileModalProps> = ({ isOpen, onClose, 
 
       <div className='flex gap-2 justify-end'>
         <Button color='primary' onClick={() => { void onConfirm() }} isLoading={loading}>Confirm Upload CV</Button>
-        <Button color='secondary' onClick={onClose}>Cancel</Button>
+        <Button color='secondary' onClick={handleClose}>Cancel</Button>
       </div>
 
     </Modal>

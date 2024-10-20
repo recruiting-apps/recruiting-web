@@ -65,6 +65,7 @@ const OfferDetailView: React.FC = () => {
           </header>
           <Divider className='my  -2' />
           <div className='[&>p]:font-semibold [&>p>span]:font-normal mb-3'>
+            <p>Status: <span className='uppercase'>{offer?.closed ? 'Closed' : 'Open'}</span></p>
             <p>Company: <span>{offer?.company}</span></p>
             {String(offer?.salary ?? '').length > 0 && <p>Salary: <span>{offer?.salary}</span></p>}
             <p>Expiration Date: <span>{moment(offer?.expirationDate).format('DD/MM/YYYY')}</span></p>
@@ -96,7 +97,7 @@ const OfferDetailView: React.FC = () => {
           <div className='shadow-card-bold rounded-md p-4'>
             <div className='flex justify-between items-center'>
               <h3 className='text-xl font-semibold'>Find the best applicant</h3>
-              {!offer.sorted && <Button isLoading={isFinding} color='primary' onClick={findBetterApplicant}>Sort Applications</Button>}
+              {!offer.sorted && <Button isLoading={isFinding} color='primary' onClick={findBetterApplicant}>Find the best applicant!</Button>}
             </div>
             <Divider className='my-2' />
             {!offer.sorted && <p className=''>We will sort all applications depending on their skills coincidence. You can decide easily!</p>}

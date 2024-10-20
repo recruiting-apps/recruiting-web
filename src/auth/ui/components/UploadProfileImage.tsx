@@ -45,7 +45,7 @@ const UploadProfileImage: React.FC<UploadProfileImageProps> = ({ setImageFile })
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
           src={imagePreview.toString()}
           alt='profile'
-          className='w-24 h-24 rounded-full mt-2 mb-2'
+          className='w-24 h-24 rounded-full mt-2 mb-2 object-contain'
         />
       )}
       <label htmlFor='profile-image' className='flex flex-col items-center justify-center'>

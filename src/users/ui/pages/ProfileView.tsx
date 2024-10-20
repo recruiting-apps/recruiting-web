@@ -12,6 +12,10 @@ import { Role } from '@/users/models/enum/role.enum'
 import PresentationLetterModal from '../components/PresentationLetterModal'
 import AdditionalFileSection from '../components/AdditionalFileSection'
 import { type AdditionalFile } from '@/users/models/additional-file.interface'
+import { EditIcon } from '@/shared/ui/assets/icons/AppIcons'
+import UploadProfileModalImage from '../components/UploadProfileImageModal'
+import { handleDownloadFormUrl } from '@/utils'
+import { useLoading } from '@/shared/hooks/useLoading'
 
 const ProfileView: React.FC = () => {
   const { id: userId } = useParams()
@@ -21,9 +25,16 @@ const ProfileView: React.FC = () => {
   const [user, setUser] = useState<User | null>(null)
   const [showUploadCV, toggleShowUploadCV] = useBooleanState()
   const [showPresentationLetters, toggleShowPresentationLetters] = useBooleanState()
+  const [showEditImage, toggleShowEditImage] = useBooleanState()
 
   const [imageError, setImageError] = useState(false)
   const [isOwnProfile, setIsOwnProfile] = useState(false)
+
+  const {
+    loading: downloading,
+    startLoading: startDownloading,
+    stopLoading: stopDownloading
+  } = useLoading({})
 
   const hasCv = user && user?.cvPath.length > 0
 
@@ -59,14 +70,10 @@ const ProfileView: React.FC = () => {
 
   const handleDownloadCV = () => {
     if (!user) return
-    const url = user?.cvPath
-    console.log(url)
 
-    const downloadAnchorNode = document.createElement('a')
-    downloadAnchorNode.setAttribute('href', url)
-    downloadAnchorNode.setAttribute('target', '_blank')
-    downloadAnchorNode.setAttribute('download', `CV-${user?.fullName}.pdf`)
-    downloadAnchorNode.click()
+    startDownloading()
+    void handleDownloadFormUrl(user.cvPath, `CV-${user?.fullName}`)
+      .finally(stopDownloading)
   }
 
   const handleEdit = () => {
@@ -98,6 +105,15 @@ const ProfileView: React.FC = () => {
     })
   }
 
+  const onImageUploadSuccess = (url: string) => {
+    if (!user) return
+
+    setUser({
+      ...user,
+      profileImagePath: url
+    })
+  }
+
   return (
     <div className='max-h-screen mb-5'>
       <div className='flex justify-between items-center'>
@@ -115,7 +131,9 @@ const ProfileView: React.FC = () => {
 
       <div className='grid grid-cols-[1fr_3fr] gap-3'>
         <section className='shadow-card py-5 px-4 rounded-md'>
-          <div className='w-[250px] h-[250px] mx-auto'>
+          <div className='w-[250px] h-[250px] mx-auto relative'>
+            <EditIcon onClick={toggleShowEditImage} className='w-8 h-8 absolute right-2 top-0 hover:text-blue cursor-pointer'></EditIcon>
+
             {imageError
               ? (
                 <img
@@ -157,8 +175,8 @@ const ProfileView: React.FC = () => {
             <div className='flex justify-between items-center'>
               <h2 className='text-lg uppercase font-semibold'>Professional Information</h2>
               <div className='flex gap-2'>
-                {isOwnProfile && <Button color='primary' onClick={toggleShowUploadCV}>{hasCv ? 'Edit CV' : 'Upload CV'}</Button>}
-                {hasCv && <Button color='primary' onClick={handleDownloadCV}>Download CV</Button>}
+                {isOwnProfile && <Button color='primary' onClick={toggleShowUploadCV}>{hasCv ? 'Update CV' : 'Upload CV'}</Button>}
+                {hasCv && <Button color='primary' onClick={handleDownloadCV} isLoading={downloading}>Download CV</Button>}
               </div>
             </div>
             <Divider className='mt-2 mb-2'></Divider>
@@ -218,6 +236,8 @@ const ProfileView: React.FC = () => {
         user={user}
         onUserChange={handleUpdateUser}
       ></PresentationLetterModal>}
+
+      <UploadProfileModalImage isOpen={showEditImage} onClose={toggleShowEditImage} onSuccessfulUpload={onImageUploadSuccess} />
     </div>
   )
 }

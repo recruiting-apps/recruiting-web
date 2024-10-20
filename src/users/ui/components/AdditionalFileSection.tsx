@@ -10,6 +10,7 @@ import Divider from '@/shared/ui/components/utils/Divider'
 import Modal from '@/shared/ui/components/utils/Modal'
 import { type AdditionalFile } from '@/users/models/additional-file.interface'
 import { AdditionalFilesService } from '@/users/services/files.service'
+import { handleDownloadFormUrl } from '@/utils'
 
 interface AdditionalFileSectionProps {
   files: AdditionalFile[]
@@ -81,6 +82,10 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
       })
   }
 
+  const onDownloadFile = (path: string, name: string) => {
+    void handleDownloadFormUrl(path, name)
+  }
+
   return (
     <div className='shadow-card px-6 py-4 rounded-md mt-5 [&>div>h3]:uppercase [&>div>h3]:font-semibold'>
       <div className='flex justify-between items-center'>
@@ -109,12 +114,14 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
                         }}
                         className='w-6 h-6 hover:text-red cursor-pointer'
                       />
-                      <a
-                        href={file.path} target='_blank' rel="noreferrer">
-                        <DownloadFileIcon
-                          className='w-6 h-6 hover:text-blue'
-                        />
-                      </a>
+
+                      <DownloadFileIcon
+                        onClick={() => {
+                          const name = file.name.split('.').slice(0, -1).join('.')
+                          onDownloadFile(file.path, name)
+                        }}
+                        className='w-6 h-6 hover:text-blue'
+                      />
                     </div>
                   </div>
                 </li>
@@ -143,7 +150,8 @@ const AdditionalFileSection: React.FC<AdditionalFileSectionProps> = ({ files, is
         <FileInput
           file={file}
           setFile={setFile}
-          admittedExtensions={['pdf', 'doc', 'docx', 'txt']}
+          maxSize={4}
+          admittedExtensions={['pdf']}
         ></FileInput>
 
         <footer className='flex gap-2 items-center mt-4'>

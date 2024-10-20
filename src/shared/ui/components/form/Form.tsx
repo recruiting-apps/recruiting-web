@@ -24,7 +24,7 @@ const Form = forwardRef(function Form (
     className = '',
     onSubmit,
     children,
-    submitText = 'Confirmar',
+    submitText = 'Confirm',
     submitColor = 'primary',
     buttonClassName = '',
     isLoading = false,
@@ -93,7 +93,7 @@ const Form = forwardRef(function Form (
 
         {
           hasCancelButton && (
-            <Button color='danger' onClick={handleCancel}>Cancelar</Button>
+            <Button color='danger' onClick={handleCancel}>Cancel</Button>
           )
         }
       </div>}
