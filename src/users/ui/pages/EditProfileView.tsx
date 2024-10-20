@@ -136,11 +136,11 @@ const EditProfileView: React.FC = () => {
                   label='Phone'
                   name='phone'
                   type='text'
-                  placeholder='999 999 999'
+                  placeholder='999999999'
                   validations={[{
-                    type: 'regex',
-                    regex: /^\d{3}\s\d{3}\s\d{3}$/,
-                    message: 'Invalid Phone'
+                    type: 'function',
+                    message: 'Phone number must have 9 digits',
+                    validate: (value) => value.length === 9
                   }]}
                   value={user?.phone}
                 />
