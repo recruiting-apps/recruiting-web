@@ -115,11 +115,6 @@ const ProfileView: React.FC = () => {
     ).then(response => {
       setUser(response)
     })
-
-    // setUser({
-    //   ...user,
-    //   profileImagePath: url
-    // })
   }
 
   return (

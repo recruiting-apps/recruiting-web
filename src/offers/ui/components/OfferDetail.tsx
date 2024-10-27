@@ -21,21 +21,11 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
   const { handleUpdateOffer } = useOffersQuery()
   const { user } = useAuth()
 
-  const [canApply, setCanApply] = useState(false)
   const [showApply, toggleShowApply] = useBooleanState()
   const [presentationLetters, setPresentationLetters] = useState<PresentationLetter[]>([])
   const [selectedPresentationLetter, setSelectedPresentationLetter] = useState<PresentationLetter | null>(null)
 
   const [applying, setApplying] = useState(false)
-
-  useEffect(() => {
-    if (!offer || !user) return
-
-    const hasUserApplied = offer.applications.some(application => application.user.id === user.id)
-
-    const canApply = offer.user.id !== user.id && !hasUserApplied && !offer.closed && user.role === Role.APPLICANT
-    setCanApply(canApply)
-  }, [offer, user])
 
   useEffect(() => {
     if (!showApply || !user) return
@@ -69,6 +59,7 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
       })
       .finally(() => {
         setApplying(false)
+        toggleShowApply()
       })
   }
 
@@ -84,7 +75,7 @@ const OfferDetail: React.FC<OfferDetailProps> = ({ offer }) => {
           <p>{offer?.location}</p>
         </div>
         <div>
-          {canApply && <Button color='primary' onClick={toggleShowApply}>Apply</Button>}
+          {user?.role === Role.APPLICANT && <Button color='primary' onClick={toggleShowApply}>Apply</Button>}
         </div>
       </header>
 
