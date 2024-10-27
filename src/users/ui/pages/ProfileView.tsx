@@ -6,7 +6,7 @@ import Divider from '@/shared/ui/components/utils/Divider'
 import Button from '@/shared/ui/components/form/Button'
 import { useBooleanState } from '@/shared/hooks/useBooleanState'
 import UploadCvFileModal from '../components/UploadCvFileModal'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import parse from 'html-react-parser'
 import { Role } from '@/users/models/enum/role.enum'
 import PresentationLetterModal from '../components/PresentationLetterModal'
@@ -19,12 +19,14 @@ import { useLoading } from '@/shared/hooks/useLoading'
 
 const ProfileView: React.FC = () => {
   const { id: userId } = useParams()
+  const location = useLocation()
   const { user: currentUser } = useAuth()
+  const { showUploadCVToApply, showPresentationLettersToApply } = location.state ?? { showUploadCVToApply: false, showPresentationLettersToApply: false }
 
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
-  const [showUploadCV, toggleShowUploadCV] = useBooleanState()
-  const [showPresentationLetters, toggleShowPresentationLetters] = useBooleanState()
+  const [showUploadCV, toggleShowUploadCV] = useBooleanState(showUploadCVToApply)
+  const [showPresentationLetters, toggleShowPresentationLetters] = useBooleanState(showPresentationLettersToApply)
   const [showEditImage, toggleShowEditImage] = useBooleanState()
 
   const [imageError, setImageError] = useState(false)
@@ -121,6 +123,8 @@ const ProfileView: React.FC = () => {
     <div className='max-h-screen mb-5'>
       <div className='flex justify-between items-center'>
         <h1 className='text-3xl font-semibold uppercase'>Profile</h1>
+
+        {showUploadCVToApply}
 
         <div className='flex gap-2 items-center'>
           {user?.role === Role.APPLICANT && isOwnProfile &&
