@@ -40,7 +40,7 @@ export class UsersService extends AppServices {
       .then(response => response.data)
   }
 
-  update = async (userDto: UserDto, id: number): Promise<User> => {
+  update = async (userDto: Partial<UserDto>, id: number): Promise<User> => {
     const { password, ...user } = userDto
     return await this.patch<User>(`/${id}`, user)
       .then(response => response.data)

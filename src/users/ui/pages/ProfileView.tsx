@@ -108,10 +108,18 @@ const ProfileView: React.FC = () => {
   const onImageUploadSuccess = (url: string) => {
     if (!user) return
 
-    setUser({
-      ...user,
+    void new UsersService().update({
       profileImagePath: url
+    },
+    user.id
+    ).then(response => {
+      setUser(response)
     })
+
+    // setUser({
+    //   ...user,
+    //   profileImagePath: url
+    // })
   }
 
   return (
