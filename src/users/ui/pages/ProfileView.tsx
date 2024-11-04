@@ -113,7 +113,7 @@ const ProfileView: React.FC = () => {
     void new UsersService().update({
       profileImagePath: url
     },
-      user.id
+    user.id
     ).then(response => {
       setUser(response)
     })
@@ -148,14 +148,14 @@ const ProfileView: React.FC = () => {
                   src="profile.jpg"
                   alt="Default Image"
                 />
-              )
+                )
               : (
                 <img
                   className='w-full h-full object-cover rounded-full'
                   src={user?.profileImagePath} alt={`Image profile ${user?.fullName}`}
                   onError={handleImageError}
                 />
-              )}
+                )}
           </div>
 
           <Divider className='mt-2 mb-2'></Divider>
