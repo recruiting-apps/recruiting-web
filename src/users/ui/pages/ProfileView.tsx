@@ -113,7 +113,7 @@ const ProfileView: React.FC = () => {
     void new UsersService().update({
       profileImagePath: url
     },
-    user.id
+      user.id
     ).then(response => {
       setUser(response)
     })
@@ -139,7 +139,7 @@ const ProfileView: React.FC = () => {
       <div className='grid grid-cols-[1fr_3fr] gap-3'>
         <section className='shadow-card py-5 px-4 rounded-md'>
           <div className='w-[250px] h-[250px] mx-auto relative'>
-            <EditIcon onClick={toggleShowEditImage} className='w-8 h-8 absolute right-2 top-0 hover:text-blue cursor-pointer'></EditIcon>
+            {isOwnProfile && <EditIcon onClick={toggleShowEditImage} className='w-8 h-8 absolute right-2 top-0 hover:text-blue cursor-pointer'></EditIcon>}
 
             {imageError
               ? (
@@ -148,14 +148,14 @@ const ProfileView: React.FC = () => {
                   src="profile.jpg"
                   alt="Default Image"
                 />
-                )
+              )
               : (
                 <img
                   className='w-full h-full object-cover rounded-full'
                   src={user?.profileImagePath} alt={`Image profile ${user?.fullName}`}
                   onError={handleImageError}
                 />
-                )}
+              )}
           </div>
 
           <Divider className='mt-2 mb-2'></Divider>
