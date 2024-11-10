@@ -71,7 +71,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
           <Button color='secondary' className='text-xs '>Show Profile</Button>
         </Link>
 
-        {betterApplicant === null && <Button className='text-xs' color='primary' onClick={toggleShowModal}>
+        {betterApplicant === null && offer?.sorted && <Button className='text-xs' color='primary' onClick={toggleShowModal}>
           Select Applicant
         </Button>}
       </footer>
